@@ -7,7 +7,7 @@ class LLMInterface:
         print(f"caricamente del modello {model_id}")
 
         #se possibile usa la gpu (cuda)
-        self.device = 0 if torch.cuda.is_available else -1
+        self.device = 0 if torch.cuda.is_available() else -1
 
         #con le gpu è conveniente usare float16 perchè è ottimizzato e va più veloce di float32(single precision) anche se più impreciso
         dtype = torch.float16 if self.device == 0 else torch.float32
@@ -36,6 +36,6 @@ class LLMInterface:
         )
 
         #Extract the answer
-        answer = outputs[0]["generated-text"][-1]["content"]
+        answer = outputs[0]["generated_text"][-1]["content"]
         return answer.strip()
 
