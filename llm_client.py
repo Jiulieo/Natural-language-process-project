@@ -1,7 +1,7 @@
 import torch
 from transformers import pipeline
 
-class LLM_interface:
+class LLMInterface:
     #di default carica il modello Qwen 1.8 bilion parameter
     def __init__(self, model_id = "Qwen/Qwen1.5-1.8B-Chat"):
         print(f"caricamente del modello {model_id}")
