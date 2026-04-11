@@ -26,7 +26,9 @@ class PromptEvolver:
         RULE:
         1)Do not generate anything but the new prompt
         2)Do not write code
-        3)Write opening with <New prompt> and ending with </New prompt>
+        3)Write opening with <prompt> and ending with </prompt>
+        Example response:
+        <prompt> Sei un esperto di logica, risolvi il problema ragionando passo per passo </prompt>
         """
         
         raw_response = self.llm_client.prompt_model(meta_prompt)
