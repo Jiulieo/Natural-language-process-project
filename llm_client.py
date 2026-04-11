@@ -16,7 +16,8 @@ class LLMInterface:
             "text-generation",
             model = model_id,
             device= self.device,
-            torch_dtype = dtype
+            torch_dtype = dtype,
+            model_kwargs={"max_length": 512}
         )
         print("modello caricato")
 
