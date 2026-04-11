@@ -14,7 +14,7 @@ class PromptEvolver:
         return 0
     
     #If the answer is wrong, then we need to feed the prompt to a model and make it perform better
-    def mutate_prompt(self, failed_prompt, wrong_answer):
+    def mutate_prompt(self, failed_prompt, problem, wrong_answer):
         meta_prompt = f"""
         You are a prompt engineer, an AI model failed to solve a logic puzzle using a specific prompt:
         -Failed prompt: {failed_prompt}
