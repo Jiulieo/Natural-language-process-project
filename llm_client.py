@@ -30,6 +30,7 @@ class LLMInterface:
         outputs = self.pipe(
             messages,
             max_new_tokens = max_new_tokens,
+            max_length = None,
             temperature = temperature,
             do_sample = True if temperature>=0 else False,
             pad_token_id=self.pipe.tokenizer.eos_token_id #Useful for Qwen
