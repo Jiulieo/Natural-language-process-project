@@ -9,7 +9,7 @@ class LLMInterface:
         #se possibile usa la gpu (cuda)
         self.device = 0 if torch.cuda.is_available() else -1
 
-        #con le gpu è conveniente usare float16 perchè è ottimizzato e va più veloce di float32(single precision) anche se più impreciso
+        #float 16 is optimized for GPU
         dtype = torch.float16 if self.device == 0 else torch.float32
 
         self.pipe = pipeline(
@@ -22,7 +22,6 @@ class LLMInterface:
 
     #send the prompt (logic problem) to the model and generate an answer
     def prompt_model(self, prompt, max_new_tokens = 150, temperature = 0.7):
-        #il prompt viene formattato
         messages = [
             {"role":"system","content": "Sei un esperto di logica, risolvi il problema ragionando passo per passo"},
             {"role":"user","content":prompt}

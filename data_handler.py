@@ -37,7 +37,7 @@ class DatasetManager():
                 correct = option
 
         return {
-            "question": question, #COMMENT
+            "question": question,
             "options": options,
             "correct_answer": correct
         }

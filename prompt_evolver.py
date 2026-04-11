@@ -16,13 +16,28 @@ class PromptEvolver:
     #If the answer is wrong, then we need to feed the prompt to a model and make it perform better
     def mutate_prompt(self, failed_prompt, problem, wrong_answer):
         meta_prompt = f"""
-        You are trying to make an AI solve this logic problem:{problem}, where:
-        -the prompt used where {failed_prompt}
-        -the AI answer with {wrong_answer}
-        Write a new prompt that is more effective using any method you like (e.g propose chain of thoughts) and answer ONLY with the new prompt
+        Analyze this error:
+
+        -Problem: {problem}
+        -Failed prompt: {failed_prompt}
+        -Wrong answer: {wrong_answer}
+        
+        You ONLY need to generate the new prompt without adding anything
+        RULE:
+        1)Do not generate anything but the new prompt
+        2)Do not write code
+        3)Write opening with <New prompt> and ending with </New prompt>
         """
-        new_prompt = self.llm_client.prompt_model(meta_prompt)
-        return new_prompt
+        
+        raw_response = self.llm_client.prompt_model(meta_prompt)
+    
+        # Estrazione robusta del contenuto tra i tag
+        match = re.search(r'<prompt>(.*?)</prompt>', raw_response, re.DOTALL)
+        if match:
+            return match.group(1).strip()
+    
+        # Fallback: se il modello fallisce i tag, restituisci comunque la risposta pulita
+        return raw_response.strip()
     
     def run_evolution(self, steps = 3):
         print(f"Prompt optimization cycle")
