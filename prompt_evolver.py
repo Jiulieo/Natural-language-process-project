@@ -22,13 +22,14 @@ class PromptEvolver:
         -Failed prompt: {failed_prompt}
         -Wrong answer: {wrong_answer}
         
-        You ONLY need to generate the new prompt without adding anything
+        Write a new prompt improved prompt to help AI solve this.
         RULE:
-        1)Do not generate anything but the new prompt
-        2)Do not write code
-        3)Write opening with <prompt> and ending with </prompt>
-        Example response:
-        <prompt> Sei un esperto di logica, risolvi il problema ragionando passo per passo </prompt>
+        1)The new prompt MUST be generic and usable for any problem, with no specific object in mind.
+        2)Instruct the AI to think step by step.
+        3)Instruct the AI to end its reasoning by repeating the exact correct option.
+        4)Write opening with <prompt> and ending with </prompt>.
+        Example:
+        <prompt> Analyze the problem step by step to find the correct order, then, write the correct answer as it appear in the option. </prompt>
         """
         
         raw_response = self.llm_client.prompt_model(meta_prompt)

@@ -16,14 +16,14 @@ class LLMInterface:
             "text-generation",
             model = model_id,
             device= self.device,
-            torch_dtype = dtype
+            dtype = dtype
         )
         print("modello caricato")
 
     #send the prompt (logic problem) to the model and generate an answer
     def prompt_model(self, prompt, max_new_tokens = 150, temperature = 0.7):
         messages = [
-            {"role":"system","content": "Sei un esperto di logica, ragionando passo per passo scomponi il problema e risolvilo"},
+            {"role":"system","content": "You are an expert of logic problem, solve the following problem step by step:"},
             {"role":"user","content":prompt}
         ]
 
