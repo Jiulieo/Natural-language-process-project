@@ -16,8 +16,7 @@ class LLMInterface:
             "text-generation",
             model = model_id,
             device= self.device,
-            torch_dtype = dtype,
-            model_kwargs={"max_length": 512}
+            torch_dtype = dtype
         )
         print("modello caricato")
 
@@ -32,7 +31,8 @@ class LLMInterface:
             messages,
             max_new_tokens = max_new_tokens,
             temperature = temperature,
-            do_sample = True if temperature>=0 else False
+            do_sample = True if temperature>=0 else False,
+            pad_token_id=self.pipe.tokenizer.eos_token_id #Useful for Qwen
         )
 
         #Extract the answer
