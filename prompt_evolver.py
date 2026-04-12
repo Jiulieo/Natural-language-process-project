@@ -15,21 +15,24 @@ class PromptEvolver:
     
     #If the answer is wrong, then we need to feed the prompt to a model and make it perform better
     def mutate_prompt(self, failed_prompt, problem, wrong_answer):
+
+        short_feedback = str(wrong_answer)[:50]
         meta_prompt = f"""
         You are a prompt engineer, an AI model failed to solve a logic puzzle using a specific prompt:
         -Failed prompt: {failed_prompt}
-        -Wrong answer: {wrong_answer}
+        -The AI give a Wrong answer starting with: {short_feedback}
         
         Your task is to write a NEW, improved prompt to help AI to reason better.
         MANDATORY RULES:
-        1)BE GENERIC: do not mention specific items from puzzle (e.g no cars, no birds, no color)
-        2)METHODOLOGICAL: order the AI to use a specific technique (e.g "build a mental map", "Chain of thought", "List the items first")
-        3)FORMAT: you must wrap your new prompt between <prompt> and </prompt> tags.
-        Example:
-        <prompt> Analyze the problem step by step to find the correct order, then, write the correct answer as it appear in the option. </prompt>
+        1)DON'T BE SPECIFIC: do not mention specific items, names, colors from puzzle (e.g no cars, no birds, no color, no name).
+        2)PROCEDURAL: you have to write a command about how to think (e.g "build a mental map", "Chain of thought").
+        3)BREVITY: Keep the new prompt under 20 words.
+        4)TAGS: wrap the prompt in <prompt> and </prompt>.
+        Correct Example:
+        <prompt>Analyze the spatial constraints step-by-step and determine the final sequence of all elements.</prompt>
         """
         
-        raw_response = self.llm_client.prompt_model(meta_prompt)
+        raw_response = self.llm_client.prompt_model(meta_prompt, max_new_tokens = 50)
     
         # use regex to extract only prompt if done correctly
         match = re.search(r'<prompt>(.*?)</prompt>', raw_response, re.DOTALL)
