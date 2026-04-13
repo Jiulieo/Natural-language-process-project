@@ -45,8 +45,12 @@ class PromptEvolver:
     
         return raw_response.strip()
     
-    def run_evolution(self, steps = 3):
+    def run_evolution(self, steps = 5):
         print(f"Prompt optimization cycle")
+
+        best_prompt = self.current_prompt
+        best_score = -1
+        best_answer_length = float('inf')
 
         for i in range(steps):
             #Get an example from the dataset
@@ -55,12 +59,20 @@ class PromptEvolver:
 
             #feed the example to the model
             answer = self.llm_client.prompt_model(full_input)
+            current_answer_len = len(answer)
 
             #evaluate answer 
             score = self.evaluate_answer(answer, sample['correct_answer'])
             
             print(f"step {i+1} | score: {score}")
 
+            #To update we use the fact that it pass the singular test
+            if score > best_score or (score == best_score and best_answer_length > current_answer_len):
+                best_score = score
+                best_prompt = self.current_prompt
+                best_answer_length = current_answer_len
+
+            
             #if score is 0, then mutate the next prompt
             if score < 1:
                 print("There was an error. New prompt generation")
@@ -69,7 +81,7 @@ class PromptEvolver:
             else:
                 print("Correct answer")
 
-        return self.current_prompt
+        return best_prompt
 
 
         
