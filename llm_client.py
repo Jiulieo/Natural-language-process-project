@@ -18,6 +18,10 @@ class LLMInterface:
             device= self.device,
             dtype = dtype
         )
+
+        if hasattr(self.pipe.model.generation_config, "max_length"):
+            self.pipe.model.generation_config.max_length = None
+            
         print("modello caricato")
 
     #send the prompt (logic problem) to the model and generate an answer

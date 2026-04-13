@@ -32,8 +32,8 @@ class PromptEvolver:
         Correct Example:
         <prompt>Analyze the spatial constraints step-by-step and determine the final sequence of all elements. Write only the answer.</prompt>
         """
-        
-        raw_response = self.llm_client.prompt_model(meta_prompt, max_new_tokens = 50)
+        #to be more rigid in the generation we lower the temperature
+        raw_response = self.llm_client.prompt_model(meta_prompt, max_new_tokens = 50, temperature = 0.1)
     
         # use regex to extract only prompt if done correctly
         match = re.search(r'<prompt>(.*?)</prompt>', raw_response, re.DOTALL)
