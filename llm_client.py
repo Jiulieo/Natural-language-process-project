@@ -19,9 +19,9 @@ class LLMInterface:
             dtype = dtype
         )
 
-        if hasattr(self.pipe.model.generation_config, "max_length"):
-            self.pipe.model.generation_config.max_length = None
-            
+        self.pipe.model.config.max_length = 4096
+        self.pipe.model.generation_config.max_length = 4096
+
         print("modello caricato")
 
     #send the prompt (logic problem) to the model and generate an answer
