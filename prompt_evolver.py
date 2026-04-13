@@ -26,10 +26,11 @@ class PromptEvolver:
         MANDATORY RULES:
         1)DON'T BE SPECIFIC: do not mention specific items, names, colors from puzzle (e.g no cars, no birds, no color, no name).
         2)PROCEDURAL: you have to write a command about how to think (e.g "build a mental map", "Chain of thought").
-        3)BREVITY: Keep the new prompt under 20 words.
-        4)TAGS: wrap the prompt in <prompt> and </prompt>.
+        3)OUTPUT FORMAT: you must instruct the AI to end its response with the exact chosen option
+        4)BREVITY: Keep the new prompt under 25 words.
+        5)TAGS: wrap the prompt in <prompt> and </prompt>.
         Correct Example:
-        <prompt>Analyze the spatial constraints step-by-step and determine the final sequence of all elements.</prompt>
+        <prompt>Analyze the spatial constraints step-by-step and determine the final sequence of all elements. Write only the answer.</prompt>
         """
         
         raw_response = self.llm_client.prompt_model(meta_prompt, max_new_tokens = 50)
