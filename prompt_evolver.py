@@ -65,6 +65,8 @@ class PromptEvolver:
             score = self.evaluate_answer(answer, sample['correct_answer'])
             
             print(f"step {i+1} | score: {score}")
+            print(f"Target corretto: {sample['correct_answer']}")
+            print(f"Risposta generata dal modello:\n{answer}")
 
             #To update we use the fact that it pass the singular test
             if score > best_score:
