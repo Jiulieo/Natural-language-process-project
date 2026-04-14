@@ -25,7 +25,7 @@ class LLMInterface:
         print("modello caricato")
 
     #send the prompt (logic problem) to the model and generate an answer
-    def prompt_model(self, prompt, max_new_tokens = 500, temperature = 0.1):
+    def prompt_model(self, prompt, max_new_tokens = 1000, temperature = 0.1):
         messages = [
             {"role":"system","content": "You are an expert of logic problem, solve the following problem step by step:"},
             {"role":"user","content":prompt}
