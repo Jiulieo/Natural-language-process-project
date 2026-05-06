@@ -8,10 +8,19 @@ class PromptEvolver:
     
     #take the answer and evaluate it
     def evaluate_answer(self, answer, correct_answer):
-        if correct_answer.lower() in answer.lower():
+        def clean_text(text):
+            text = text.lower()
+            text = text.translate(str.maketrans('','',string.punctuation))
+            text = text.replace("the ", "").replace("a ", "").replace("an ","")
+            return "".join(text.split())
+
+        clean_correct = clean_text(correct_answer)
+        clean_model = clean_text(answer)
+
+        if clean_correct in clean_model:
             #Answer correct, give full point
-            return 1
-        return 0
+            return 1.0
+        return 0.0
     
     #If the answer is wrong, then we need to feed the prompt to a model and make it perform better
     def mutate_prompt(self, failed_prompt, problem, wrong_answer):
