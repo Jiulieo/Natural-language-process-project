@@ -16,7 +16,7 @@ class LLMInterface:
             "text-generation",
             model = model_id,
             device= self.device,
-            dtype = dtype
+            torch_dtype = dtype
         )
 
         self.pipe.model.config.max_length = 4096
@@ -34,9 +34,8 @@ class LLMInterface:
         outputs = self.pipe(
             messages,
             max_new_tokens = max_new_tokens,
-            max_length = None,
             temperature = temperature,
-            do_sample = True if temperature>=0 else False,
+            do_sample = True if temperature>0 else False,
             pad_token_id=self.pipe.tokenizer.eos_token_id #Useful for Qwen
         )
 

@@ -72,7 +72,7 @@ class PromptEvolver:
             full_input = f"{self.current_prompt} \n\n {sample['question']}"
 
             #feed the example to the model
-            answer = self.llm_client.prompt_model(full_input, max_new_tokens = 1024)
+            answer = self.llm_client.prompt_model(full_input, max_new_tokens = 512)
             current_answer_len = len(answer)
 
             #Save data to plot
