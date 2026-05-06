@@ -47,7 +47,7 @@ class PromptEvolver:
         <prompt>"""
 
         #to be more rigid in the generation we lower the temperature
-        raw_response = self.llm_client.prompt_model(meta_prompt, max_new_tokens = 100)
+        raw_response = self.llm_client.prompt_model(meta_prompt, max_new_tokens = 100, temperature = 0.1)
     
         # use regex to extract only prompt if done correctly
         match = re.search(r'<prompt>(.*?)</prompt>', raw_response, re.DOTALL)
@@ -69,7 +69,7 @@ class PromptEvolver:
             full_input = f"{self.current_prompt} \n\n {sample['question']}"
 
             #feed the example to the model
-            answer = self.llm_client.prompt_model(full_input)
+            answer = self.llm_client.prompt_model(full_input, max_new_tokens = 512)
             current_answer_len = len(answer)
 
             #evaluate answer 
