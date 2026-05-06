@@ -63,6 +63,9 @@ class PromptEvolver:
         best_score = -1
         best_answer_length = float('inf')
 
+        history_lengths = []
+        history_scores = []
+
         for i in range(steps):
             #Get an example from the dataset
             sample = self.data_manager.get_random_sample()
@@ -71,6 +74,9 @@ class PromptEvolver:
             #feed the example to the model
             answer = self.llm_client.prompt_model(full_input, max_new_tokens = 512)
             current_answer_len = len(answer)
+
+            #Save data to plot
+            history_lengths.append(current_answer_len)
 
             #evaluate answer 
             score = self.evaluate_answer(answer, sample['correct_answer'])
@@ -98,7 +104,12 @@ class PromptEvolver:
             else:
                 print("Correct answer")
 
-        return best_prompt
+        #return like that to store in a dictionary
+        return {
+            "best_prompt": best_prompt,
+            "lengths_over_time": history_lengths,
+            "scores_over_time": history_scores
+        }
 
 
         
