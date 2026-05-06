@@ -27,24 +27,25 @@ class PromptEvolver:
     def mutate_prompt(self, failed_prompt, problem, wrong_answer):
 
         short_feedback = str(wrong_answer)[:50]
-        meta_prompt = f"""
-        You are a Prompt Engineer. Your task is to write a short, universal instruction for a logic puzzle solver.
+        meta_prompt = f"""You are a Prompt Engineer. Your task is to write a short, universal instruction for a logic puzzle solver.
 
         FAILED PROMPT: "{failed_prompt}"
 
-        Write a new, improved instruction. It must be a single sentence.
+        Write a new, improved instruction. It must be ONE sentence.
+        The 1.8B model gets confused if it reasons too much. Instruct it to be CONCISE and direct.
 
-        BAD EXAMPLES (Too specific):
-        - <prompt>Assume there are four objects in a square grid.</prompt>
-        - <prompt>If Dan is next to the red car, find the speed.</prompt>
+        BAD EXAMPLES (Causes hallucinations):
+        - <prompt>Break down the problem into manageable steps and reason systematically.</prompt>
+        - <prompt>Analyze the sequence of letters and numbers step-by-step.</prompt>
 
-        GOOD EXAMPLES (Procedural and universal):
-        - <prompt>Analyze the constraints step-by-step and determine the final logical sequence.</prompt>
-        - <prompt>Map the relationships between the entities to find the correct order.</prompt>
-        - <prompt>Break down the problem logically and output the exact correct option.</prompt>
+        GOOD EXAMPLES (Forces direct, concise answers):
+        - <prompt>Read the constraints carefully and output ONLY the final correct statement.</prompt>
+        - <prompt>Determine the correct order and write the final answer in a single sentence.</prompt>
+        - <prompt>Solve the logic puzzle and directly state the final choice without extra reasoning.</prompt>
 
         NEW PROMPT:
         <prompt>"""
+        
         #to be more rigid in the generation we lower the temperature
         raw_response = self.llm_client.prompt_model(meta_prompt, max_new_tokens = 150, temperature = 0.1)
     
