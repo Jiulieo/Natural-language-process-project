@@ -26,11 +26,12 @@ class PromptEvolver:
     #Evaluation based using an llm.
     def evaluate_answer_model(self, model_answer, correct_answer):
         judge_prompt = f"""
-        You are an evaluator. 
-        The target fact is: "{correct_answer}"
-        The student's answer is: "{model_answer}"
+        You are a strict logic evaluator.
+        The correct fact is: "{correct_answer}"
+        The student produced this reasoning and conclusion: "{model_answer}"
         
-        Based on the student's answer, is the target fact true? 
+        Does the student's conclusion EXACTLY match the correct fact? 
+        If the student's sequence contradicts the correct fact, you must answer NO.
         Answer ONLY with "YES" or "NO".
         """
         
