@@ -23,6 +23,23 @@ class PromptEvolver:
             return 1.0
         return 0.0
     
+    #Evaluation based using an llm.
+    def evaluate_answer_model(self, model_answer, correct_answer):
+        judge_prompt = f"""
+        You are an evaluator. 
+        The target fact is: "{correct_answer}"
+        The student's answer is: "{model_answer}"
+        
+        Based on the student's answer, is the target fact true? 
+        Answer ONLY with "YES" or "NO".
+        """
+        
+        judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=10, temperature=0.0)
+        
+        if "yes" in judgment.lower():
+            return 1.0
+        return 0.0
+    
     #If the answer is wrong, then we need to feed the prompt to a model and make it perform better
     def mutate_prompt(self, failed_prompt, problem, wrong_answer):
 
@@ -75,7 +92,7 @@ class PromptEvolver:
     
         return raw_response.strip()
     
-    def run_evolution(self, steps = 5):
+    def run_evolution(self, steps = 5,evaluation = "standard"):
         print(f"Prompt optimization cycle")
 
         best_prompt = self.current_prompt
@@ -98,8 +115,11 @@ class PromptEvolver:
             history_lengths.append(current_answer_len)
 
             #evaluate answer 
-            score = self.evaluate_answer(answer, sample['correct_answer'])
-            
+            if evaluation == "standard":
+                score = self.evaluate_answer(answer, sample['correct_answer'])
+            else:
+                score = self.evaluate_answer_model(answer, sample['correct_answer'])
+
             print(f"step {i+1} | score: {score}")
             print(f"Target corretto: {sample['correct_answer']}")
             print(f"Risposta generata dal modello:\n{answer}")
