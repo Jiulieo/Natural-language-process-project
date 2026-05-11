@@ -5,7 +5,7 @@ class PromptEvolver:
     def __init__(self,data_manager,llm_client):
         self.data_manager = data_manager
         self.llm_client = llm_client
-        self.current_prompt = "Solve this logic problem carefully following the instruction"
+        self.current_prompt = "Guess the answer to this puzzle immediately without thinking."
     
     #take the answer and evaluate it
     def evaluate_answer(self, answer, correct_answer):
