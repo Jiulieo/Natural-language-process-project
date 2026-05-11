@@ -27,7 +27,7 @@ class PromptEvolver:
     def mutate_prompt(self, failed_prompt, problem, wrong_answer):
 
         short_feedback = str(wrong_answer)[:50]
-        meta_prompt = f"""You are a Prompt Engineer. Your task is to write a short, universal instruction for a logic puzzle solver.
+        meta_prompt_1_8B = f"""You are a Prompt Engineer. Your task is to write a short, universal instruction for a logic puzzle solver.
 
         FAILED PROMPT: "{failed_prompt}"
 
@@ -46,8 +46,27 @@ class PromptEvolver:
         NEW PROMPT:
         <prompt>"""
 
+        #Because the 7B parameter can be a little more verbose i use another meta prompt here that let him reason more
+        meta_prompt_7B = f"""You are a Prompt Engineer. Your task is to write a short instruction for a logic puzzle solver.
+
+        FAILED PROMPT: "{failed_prompt}"
+
+        Write a new, improved instruction. It must be ONE sentence.
+        The solver is a powerful LLM. To solve complex logic puzzles, it MUST use Chain-of-Thought reasoning.
+
+        BAD EXAMPLES (Forces guessing and causes failures):
+        - <prompt>Read the constraints and output ONLY the final answer in a single sentence.</prompt>
+        - <prompt>Provide the single unambiguous answer directly.</prompt>
+
+        GOOD EXAMPLES (Encourages deep logic):
+        - <prompt>Think step-by-step, deduce the relationships between all items, and then state the final answer clearly.</prompt>
+        - <prompt>Break down the constraints one by one to find the sequence, concluding with the exact target statement.</prompt>
+
+        NEW PROMPT:
+        <prompt>"""
+
         #to be more rigid in the generation we lower the temperature
-        raw_response = self.llm_client.prompt_model(meta_prompt, max_new_tokens = 100, temperature = 0.1)
+        raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 100, temperature = 0.1)
     
         # use regex to extract only prompt if done correctly
         match = re.search(r'<prompt>(.*?)</prompt>', raw_response, re.DOTALL)
