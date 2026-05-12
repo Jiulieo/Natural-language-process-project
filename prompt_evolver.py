@@ -76,9 +76,9 @@ class PromptEvolver:
         - <prompt>Read the constraints and output ONLY the final answer in a single sentence.</prompt>
         - <prompt>Provide the single unambiguous answer directly.</prompt>
 
-        GOOD EXAMPLES (Encourages deep logic):
-        - <prompt>Think step-by-step, deduce the relationships between all items, and then state the final answer clearly.</prompt>
-        - <prompt>Break down the constraints one by one to find the sequence, concluding with the exact target statement.</prompt>
+        GOOD EXAMPLES (Encourages deep logic AND easy evaluation):
+        - <prompt>Think step-by-step, deduce the relationships between all items, and end your response with the exact target statement.</prompt>
+        - <prompt>Break down the constraints one by one to find the sequence, and make sure your final sentence contains the exact target string.</prompt>
 
         NEW PROMPT:
         <prompt>"""
