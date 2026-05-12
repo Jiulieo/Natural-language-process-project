@@ -35,19 +35,30 @@ class PromptEvolver:
             return 1.0
         return 0.0
     
-    #Evaluation based using an llm.
+    # Evaluation based using an llm with Few-Shot Examples
     def evaluate_answer_model(self, model_answer, correct_answer):
         judge_prompt = f"""You are a strict and objective grading assistant.
-        Target Fact to verify: "{correct_answer}"
-        Student's Answer: "{model_answer}"
+        Read the student's answer and check if the "Target Fact" is true according to the student's sequence.
 
-        Task: Check if the student's sequence places the subject in the exact position required by the Target Fact.
-        Think step-by-step. Count the positions in the student's answer. 
-        Conclude your evaluation by writing exactly "[YES]" if the student is perfectly correct, or "[NO]" if the student's order contradicts the Target Fact.
-        """
+        --- Example 1 ---
+        Target Fact: "Eli finished third."
+        Student's Answer: "The order is: 1. Joe, 2. Ada, 3. Amy, 4. Mel, 5. Eli"
+        Analysis: The student placed Eli in the 5th position. The target fact requires Eli to be third. This is a mismatch.
+        Verdict: [NO]
+
+        --- Example 2 ---
+        Target Fact: "The crow is the second from the left."
+        Student's Answer: "From left to right: Blue jay, Crow, Quail, Falcon, Robin."
+        Analysis: The student placed Crow in the 2nd position from the left. The target fact requires Crow to be second. This is a match.
+        Verdict: [YES]
+
+        --- REAL EVALUATION ---
+        Target Fact: "{correct_answer}"
+        Student's Answer: "{model_answer}"
+        Analysis:"""
         
         judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=150, temperature=0.0)
-        print(judgment)
+        print(f"\n[GIUDICE LLM]: {judgment.strip()}\n")
         
         if "[YES]" in judgment.upper():
             return 1.0
