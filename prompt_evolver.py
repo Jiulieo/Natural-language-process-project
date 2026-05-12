@@ -38,13 +38,14 @@ class PromptEvolver:
     #Evaluation based using an llm.
     def evaluate_answer_model(self, model_answer, correct_answer):
         judge_prompt = f"""
-        You are a strict logic evaluator.
-        The correct fact is: "{correct_answer}"
-        The student produced this reasoning and conclusion: "{model_answer}"
+        You are an expert logic evaluator.
+        Target Fact to verify: "{correct_answer}"
+        Student's Answer: "{model_answer}"
+
+        Task: Read the Student's Answer. Does the logical order or conclusion presented by the student logically confirm the Target Fact? 
+        (Example: if the Target is 'Apple is second' and the Student writes the list 'Banana, Apple, Orange', you must answer YES).
         
-        Does the student's conclusion EXACTLY match the correct fact? 
-        If the student's sequence contradicts the correct fact, you must answer NO.
-        Answer ONLY with "YES" or "NO".
+        Respond with ONLY a single word: YES or NO.
         """
         
         judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=10, temperature=0.0)
@@ -83,17 +84,15 @@ class PromptEvolver:
 
         Write a new instruction. It must be ONE sentence.
         The solver is a powerful LLM. It MUST use Chain-of-Thought reasoning.
-        CRITICAL ISSUE: The solver often over-explains by listing the entire order of all items instead of answering the specific question asked by the prompt.
 
         BAD EXAMPLES:
-        - <prompt>Think step-by-step and write the final arrangement in an <answer> tag.</prompt>
-        - <prompt>Solve the puzzle and output the full order.</prompt>
+        - <prompt>Guess the answer immediately.</prompt>
+        - <prompt>Output only the final answer without reasoning.</prompt>
 
-        GOOD EXAMPLES (Forces focus on the specific target statement):
-        - <prompt>Think step-by-step to deduce the relationships, but inside the <answer> tag, write ONLY the specific sentence that answers the final question asked, without listing all items.</prompt>
-        - <prompt>Break down the constraints to find the full sequence, but make sure the text inside your <answer> tag contains ONLY the exact, single statement requested.</prompt>
-        - <prompt>Reason about the problem using chain of thought, when the reason is complete, answer to the question shortly inside the <answer> tag.<prompt>
-        
+        GOOD EXAMPLES:
+        - <prompt>Think step-by-step, deduce the relationships between all items, and clearly write the final logical order.</prompt>
+        - <prompt>Break down the constraints step-by-step to find the sequence of all objects.</prompt>
+
         NEW PROMPT:
         <prompt>"""
 
