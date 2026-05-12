@@ -138,15 +138,20 @@ class PromptEvolver:
             print(f"Target corretto: {sample['correct_answer']}")
             print(f"Risposta generata dal modello:\n{answer}")
 
-            #To update we use the fact that it pass the singular test
+            # To update we use the fact that it pass the singular test
             if score > best_score:
                 best_score = score
                 best_prompt = self.current_prompt
                 best_answer_length = current_answer_len
-            elif score == best_score and score == 1.0 and current_answer_len < best_answer_length:
-                # It tied for the best score (a perfect 1.0), AND it was more efficient
-                best_prompt = self.current_prompt
-                best_answer_length = current_answer_len
+            elif score == best_score and score == 1.0:
+                # Se usiamo la valutazione LLM (modelli grandi), premiamo la verbosità (CoT)
+                if evaluation == "model" and current_answer_len > best_answer_length:
+                    best_prompt = self.current_prompt
+                    best_answer_length = current_answer_len
+                # Se usiamo la valutazione standard (modelli piccoli), premiamo la sintesi
+                elif evaluation == "standard" and current_answer_len < best_answer_length:
+                    best_prompt = self.current_prompt
+                    best_answer_length = current_answer_len
 
             
             #if score is 0, then mutate the next prompt
