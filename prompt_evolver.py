@@ -9,17 +9,29 @@ class PromptEvolver:
     
     #take the answer and evaluate it
     def evaluate_answer(self, answer, correct_answer):
+        import string
+        import re
+
         def clean_text(text):
             text = text.lower()
             text = text.translate(str.maketrans('','',string.punctuation))
             text = text.replace("the ", "").replace("a ", "").replace("an ","")
             return "".join(text.split())
 
+        # Prova a estrarre il tag <answer>
+        match = re.search(r'<answer>(.*?)</answer>', answer, re.IGNORECASE)
+        if match:
+            extracted_answer = match.group(1)
+        else:
+            # Se il modello non ha usato il tag, usa l'ultima frase
+            extracted_answer = answer.split('.')[-2] if '.' in answer else answer
+            
         clean_correct = clean_text(correct_answer)
-        clean_model = clean_text(answer)
+        clean_model = clean_text(extracted_answer)
+        print(clean_correct)
+        print(clean_model)
 
         if clean_correct in clean_model:
-            #Answer correct, give full point
             return 1.0
         return 0.0
     
@@ -69,16 +81,15 @@ class PromptEvolver:
 
         FAILED PROMPT: "{failed_prompt}"
 
-        Write a new, improved instruction. It must be ONE sentence.
-        The solver is a powerful LLM. To solve complex logic puzzles, it MUST use Chain-of-Thought reasoning.
+        Write a new instruction. It must be ONE sentence.
+        The solver is a powerful LLM. It MUST use Chain-of-Thought reasoning, but it MUST wrap its final, exact target string inside an <answer> tag.
 
-        BAD EXAMPLES (Forces guessing and causes failures):
-        - <prompt>Read the constraints and output ONLY the final answer in a single sentence.</prompt>
-        - <prompt>Provide the single unambiguous answer directly.</prompt>
+        BAD EXAMPLES (Forces guessing):
+        - <prompt>Read the constraints and output ONLY the final answer.</prompt>
 
-        GOOD EXAMPLES (Encourages deep logic AND easy evaluation):
-        - <prompt>Think step-by-step, deduce the relationships between all items, and end your response with the exact target statement.</prompt>
-        - <prompt>Break down the constraints one by one to find the sequence, and make sure your final sentence contains the exact target string.</prompt>
+        GOOD EXAMPLES (Encourages logic and strict formatting):
+        - <prompt>Think step-by-step, deduce the relationships between all items, and end your response by putting the exact target statement inside <answer> and </answer> tags.</prompt>
+        - <prompt>Break down the constraints to find the sequence, and make sure your final conclusion is written exactly inside an <answer> tag.</prompt>
 
         NEW PROMPT:
         <prompt>"""
