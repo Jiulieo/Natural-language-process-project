@@ -82,15 +82,18 @@ class PromptEvolver:
         FAILED PROMPT: "{failed_prompt}"
 
         Write a new instruction. It must be ONE sentence.
-        The solver is a powerful LLM. It MUST use Chain-of-Thought reasoning, but it MUST wrap its final, exact target string inside an <answer> tag.
+        The solver is a powerful LLM. It MUST use Chain-of-Thought reasoning.
+        CRITICAL ISSUE: The solver often over-explains by listing the entire order of all items instead of answering the specific question asked by the prompt.
 
-        BAD EXAMPLES (Forces guessing):
-        - <prompt>Read the constraints and output ONLY the final answer.</prompt>
+        BAD EXAMPLES:
+        - <prompt>Think step-by-step and write the final arrangement in an <answer> tag.</prompt>
+        - <prompt>Solve the puzzle and output the full order.</prompt>
 
-        GOOD EXAMPLES (Encourages logic and strict formatting):
-        - <prompt>Think step-by-step, deduce the relationships between all items, and end your response by putting the exact target statement inside <answer> and </answer> tags.</prompt>
-        - <prompt>Break down the constraints to find the sequence, and make sure your final conclusion is written exactly inside an <answer> tag.</prompt>
-
+        GOOD EXAMPLES (Forces focus on the specific target statement):
+        - <prompt>Think step-by-step to deduce the relationships, but inside the <answer> tag, write ONLY the specific sentence that answers the final question asked, without listing all items.</prompt>
+        - <prompt>Break down the constraints to find the full sequence, but make sure the text inside your <answer> tag contains ONLY the exact, single statement requested.</prompt>
+        - <prompt>Reason about the problem using chain of thought, when the reason is complete, answer to the question shortly inside the <answer> tag.<prompt>
+        
         NEW PROMPT:
         <prompt>"""
 
