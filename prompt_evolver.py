@@ -37,20 +37,19 @@ class PromptEvolver:
     
     #Evaluation based using an llm.
     def evaluate_answer_model(self, model_answer, correct_answer):
-        judge_prompt = f"""
-        You are an expert logic evaluator.
+        judge_prompt = f"""You are a strict and objective grading assistant.
         Target Fact to verify: "{correct_answer}"
         Student's Answer: "{model_answer}"
 
-        Task: Read the Student's Answer. Does the logical order or conclusion presented by the student logically confirm the Target Fact? 
-        (Example: if the Target is 'Apple is second' and the Student writes the list 'Banana, Apple, Orange', you must answer YES).
-        
-        Respond with ONLY a single word: YES or NO.
+        Task: Check if the student's sequence places the subject in the exact position required by the Target Fact.
+        Think step-by-step. Count the positions in the student's answer. 
+        Conclude your evaluation by writing exactly "[YES]" if the student is perfectly correct, or "[NO]" if the student's order contradicts the Target Fact.
         """
         
-        judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=10, temperature=0.0)
+        judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=150, temperature=0.0)
+        print(judgment)
         
-        if "yes" in judgment.lower():
+        if "[YES]" in judgment.upper():
             return 1.0
         return 0.0
     
