@@ -96,24 +96,29 @@ class PromptEvolver:
         <prompt>"""
 
         #Because the 7B parameter can be a little more verbose i use another meta prompt here that let him reason more
-        meta_prompt_7B = f"""You are an expert Prompt Engineer. Your task is to write a single-sentence instruction for a logic puzzle solver.
+        meta_prompt_7B = f"""You are an expert Prompt Engineer for a logic puzzle solver.
+        Your task is to analyze a failed prompt and write an improved, single-sentence instruction.
 
-        FAILED PROMPT: "{failed_prompt}"
+        --- EXAMPLE 1 ---
+        Failed Prompt: "Guess the answer immediately."
+        Issue: It encourages random guessing instead of logic.
+        Improved Prompt: "Think step-by-step to deduce the relationships, and enclose your final factual conclusion inside <answer> tags."
 
-        CRITICAL RULES FOR THE NEW PROMPT:
-        1. The solver is a 7B LLM. It MUST use Chain-of-Thought (think step-by-step).
-        2. The solver MUST put its final deduced statement inside <answer> and </answer> tags.
+        --- EXAMPLE 2 ---
+        Failed Prompt: "Find the missing number in the sequence."
+        Issue: The solver is dealing with text-based logic grid puzzles, not math or arithmetic sequences.
+        Improved Prompt: "Break down the logic constraints, determine the full sequence of items, and write the specific requested statement inside an <answer> tag."
 
-        BAD EXAMPLES:
-        - <prompt>Find the missing item in the sequence.</prompt>
-        - <prompt>Guess the answer immediately.</prompt>
+        --- EXAMPLE 3 ---
+        Failed Prompt: "Solve the puzzle and output the full order."
+        Issue: The solver outputs long comma-separated lists instead of directly answering the specific question asked by the target fact.
+        Improved Prompt: "Use Chain-of-Thought reasoning to find the order, but inside the <answer> tag, write ONLY the specific sentence that answers the exact question."
 
-        GOOD EXAMPLES:
-        - <prompt>Think step-by-step to deduce the exact order of all items, then write your final statement inside an <answer> tag.</prompt>
-        - <prompt>Break down the logic constraints step-by-step, determine the sequence, and enclose the final true statement in <answer> tags.</prompt>
-
-        NEW PROMPT:
-        <prompt>"""
+        --- CURRENT TASK ---
+        Failed Prompt: "{failed_prompt}"
+        Issue: The prompt fails to extract a single formatted sentence from the solver, causing evaluation errors.
+        Improved Prompt:
+        <instruction>"""
 
         #to be more rigid in the generation we lower the temperature
         raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 100, temperature = 0.1)
