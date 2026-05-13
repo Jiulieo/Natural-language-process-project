@@ -28,10 +28,12 @@ class PromptEvolver:
             return "".join(text.split())
 
         # Prova a estrarre il tag <answer>
-        match = re.search(r'<answer>(.*?)</answer>', answer, re.IGNORECASE | re.DOTALL)
+        match = re.search(r'<prompt>(.*?)</prompt>', answer, re.IGNORECASE | re.DOTALL)
         if match:
+            print("I was able to extract")
             extracted_answer = match.group(1)
         else:
+            print("I was unable to extract")
             extracted_answer = answer
             
         clean_correct = clean_text(correct_answer)
@@ -118,7 +120,7 @@ class PromptEvolver:
         Failed Prompt: "{failed_prompt}"
         Issue: The prompt fails because it does not explicitly instruct the model to think step-by-step or use Chain-of-Thought before writing the formatted answer.
         Improved Prompt:
-        <instruction>"""
+        <Prompt>"""
 
         #to be more rigid in the generation we lower the temperature
         raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 100, temperature = 0.1)
