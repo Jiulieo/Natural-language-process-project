@@ -32,7 +32,7 @@ class PromptEvolver:
         if match:
             extracted_answer = match.group(1)
         else:
-            extracted_answer = answer.split('.')[-2] if '.' in answer else answer
+            extracted_answer = answer
             
         clean_correct = clean_text(correct_answer)
         clean_model = clean_text(extracted_answer)
@@ -96,22 +96,22 @@ class PromptEvolver:
         <prompt>"""
 
         #Because the 7B parameter can be a little more verbose i use another meta prompt here that let him reason more
-        meta_prompt_7B = f"""You are a Prompt Engineer. Your task is to write a short instruction for a logic puzzle solver.
+        meta_prompt_7B = f"""You are an expert Prompt Engineer. Your task is to write a single-sentence instruction for a logic puzzle solver.
 
         FAILED PROMPT: "{failed_prompt}"
 
-        Write a new instruction. It must be ONE sentence.
-        The solver is a powerful LLM. It MUST use Chain-of-Thought reasoning.
-        CRITICAL ISSUE: The solver fails because it writes comma-separated lists instead of writing the specific target sentence.
+        CRITICAL RULES FOR THE NEW PROMPT:
+        1. The solver is a 7B LLM. It MUST use Chain-of-Thought (think step-by-step).
+        2. The solver MUST put its final deduced statement inside <answer> and </answer> tags.
 
         BAD EXAMPLES:
-        - <prompt>Think step-by-step and write the final list in an <answer> tag.</prompt>
-        - <prompt>Solve the puzzle and output the full order.</prompt>
+        - <prompt>Find the missing item in the sequence.</prompt>
+        - <prompt>Guess the answer immediately.</prompt>
 
-        GOOD EXAMPLES (Forces exact sentence matching):
-        - <prompt>Think step-by-step. In the <answer> tag, DO NOT write a list; write ONLY the specific sentence that answers the question.</prompt>
-        - <prompt>Deduce the full sequence, but inside your <answer> tag, write ONLY the exact requested statement in plain English.</prompt>
-        
+        GOOD EXAMPLES:
+        - <prompt>Think step-by-step to deduce the exact order of all items, then write your final statement inside an <answer> tag.</prompt>
+        - <prompt>Break down the logic constraints step-by-step, determine the sequence, and enclose the final true statement in <answer> tags.</prompt>
+
         NEW PROMPT:
         <prompt>"""
 
@@ -130,7 +130,7 @@ class PromptEvolver:
 
         best_prompt = self.current_prompt
         best_score = -1
-        best_answer_length = float('inf')
+        best_answer_length = -1
 
         history_lengths = []
         history_scores = []
