@@ -15,7 +15,16 @@ class PromptEvolver:
         def clean_text(text):
             text = text.lower()
             text = text.translate(str.maketrans('','',string.punctuation))
-            text = text.replace("the ", "").replace("a ", "").replace("an ","")
+            
+            # Lista di parole "inutili" da ignorare nel confronto (Stop-Words)
+            filler_words = [" the ", " a ", " an ", " is ", " are ", " which ", " that ", " from ", " to ", " of ", " in ", " on "]
+            
+            # Aggiungiamo spazi all'inizio e alla fine per rimpiazzare correttamente le parole isolate
+            text = " " + text + " "
+            for word in filler_words:
+                text = text.replace(word, " ")
+                
+            # Rimuoviamo tutti gli spazi rimanenti
             return "".join(text.split())
 
         # Prova a estrarre il tag <answer>
@@ -23,8 +32,7 @@ class PromptEvolver:
         if match:
             extracted_answer = match.group(1)
         else:
-            # Se il modello non ha usato il tag, usa l'ultima frase
-            extracted_answer = answer
+            extracted_answer = answer.split('.')[-2] if '.' in answer else answer
             
         clean_correct = clean_text(correct_answer)
         clean_model = clean_text(extracted_answer)
