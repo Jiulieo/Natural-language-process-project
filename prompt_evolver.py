@@ -16,7 +16,7 @@ class PromptEvolver:
         --- REAL EVALUATION ---
         Correct Answer: "{correct_answer}"
         Student's Answer: "{model_answer}"
-        is student answer correct?"""
+        is student answer correct? If so answer with [YES]"""
         
         judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=150, temperature=0.0)
         print(f"\n[GIUDICE LLM]: {judgment.strip()}\n")
