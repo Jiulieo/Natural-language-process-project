@@ -19,12 +19,12 @@ class PromptEvolver:
             return "".join(text.split())
 
         # Prova a estrarre il tag <answer>
-        match = re.search(r'<answer>(.*?)</answer>', answer, re.IGNORECASE)
+        match = re.search(r'<answer>(.*?)</answer>', answer, re.IGNORECASE | re.DOTALL)
         if match:
             extracted_answer = match.group(1)
         else:
             # Se il modello non ha usato il tag, usa l'ultima frase
-            extracted_answer = answer.split('.')[-2] if '.' in answer else answer
+            extracted_answer = answer
             
         clean_correct = clean_text(correct_answer)
         clean_model = clean_text(extracted_answer)
@@ -94,15 +94,16 @@ class PromptEvolver:
 
         Write a new instruction. It must be ONE sentence.
         The solver is a powerful LLM. It MUST use Chain-of-Thought reasoning.
+        CRITICAL ISSUE: The solver fails because it writes comma-separated lists instead of writing the specific target sentence.
 
         BAD EXAMPLES:
-        - <prompt>Guess the answer immediately.</prompt>
-        - <prompt>Output only the final answer without reasoning.</prompt>
+        - <prompt>Think step-by-step and write the final list in an <answer> tag.</prompt>
+        - <prompt>Solve the puzzle and output the full order.</prompt>
 
-        GOOD EXAMPLES:
-        - <prompt>Think step-by-step, deduce the relationships between all items, and clearly write the final logical order.</prompt>
-        - <prompt>Break down the constraints step-by-step to find the sequence of all objects.</prompt>
-
+        GOOD EXAMPLES (Forces exact sentence matching):
+        - <prompt>Think step-by-step. In the <answer> tag, DO NOT write a list; write ONLY the specific sentence that answers the question.</prompt>
+        - <prompt>Deduce the full sequence, but inside your <answer> tag, write ONLY the exact requested statement in plain English.</prompt>
+        
         NEW PROMPT:
         <prompt>"""
 
