@@ -101,22 +101,22 @@ class PromptEvolver:
 
         --- EXAMPLE 1 ---
         Failed Prompt: "Guess the answer immediately."
-        Issue: It encourages random guessing instead of logic.
-        Improved Prompt: "Think step-by-step to deduce the relationships, and enclose your final factual conclusion inside <answer> tags."
+        Issue: It encourages random guessing instead of step-by-step logic.
+        Improved Prompt: "Think step-by-step to logically deduce the order of all items, and then enclose your final factual conclusion strictly inside <answer> tags."
 
         --- EXAMPLE 2 ---
-        Failed Prompt: "Find the missing number in the sequence."
-        Issue: The solver is dealing with text-based logic grid puzzles, not math or arithmetic sequences.
-        Improved Prompt: "Break down the logic constraints, determine the full sequence of items, and write the specific requested statement inside an <answer> tag."
+        Failed Prompt: "Solve the puzzle and output the full order."
+        Issue: The solver outputs long lists and skips reasoning. It needs to use Chain-of-Thought to find the sequence, but only output the final fact.
+        Improved Prompt: "Use Chain-of-Thought reasoning to find the complete sequence, but inside the <answer> tag, write ONLY the specific sentence that answers the exact target question."
 
         --- EXAMPLE 3 ---
-        Failed Prompt: "Solve the puzzle and output the full order."
-        Issue: The solver outputs long comma-separated lists instead of directly answering the specific question asked by the target fact.
-        Improved Prompt: "Use Chain-of-Thought reasoning to find the order, but inside the <answer> tag, write ONLY the specific sentence that answers the exact question."
+        Failed Prompt: "Write a single clear sentence in the answer tag."
+        Issue: The prompt formats the answer correctly, but forgets to tell the model to reason first. Without explicitly saying "think step-by-step", the solver will guess.
+        Improved Prompt: "Employ step-by-step logical deduction to solve the constraints, and enclose ONLY the exact requested statement inside an <answer> tag."
 
         --- CURRENT TASK ---
         Failed Prompt: "{failed_prompt}"
-        Issue: The prompt fails to extract a single formatted sentence from the solver, causing evaluation errors.
+        Issue: The prompt fails because it does not explicitly instruct the model to think step-by-step or use Chain-of-Thought before writing the formatted answer.
         Improved Prompt:
         <instruction>"""
 
