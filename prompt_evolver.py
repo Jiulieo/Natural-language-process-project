@@ -7,65 +7,16 @@ class PromptEvolver:
         self.llm_client = llm_client
         self.current_prompt = "Guess the answer to this puzzle immediately without thinking."
     
-    #take the answer and evaluate it
-    def evaluate_answer(self, answer, correct_answer):
-        import string
-        import re
-
-        def clean_text(text):
-            text = text.lower()
-            text = text.translate(str.maketrans('','',string.punctuation))
-            
-            # Lista di parole "inutili" da ignorare nel confronto (Stop-Words)
-            filler_words = [" the ", " a ", " an ", " is ", " are ", " which ", " that ", " from ", " to ", " of ", " in ", " on "]
-            
-            # Aggiungiamo spazi all'inizio e alla fine per rimpiazzare correttamente le parole isolate
-            text = " " + text + " "
-            for word in filler_words:
-                text = text.replace(word, " ")
-                
-            # Rimuoviamo tutti gli spazi rimanenti
-            return "".join(text.split())
-
-        # Prova a estrarre il tag <answer>
-        match = re.search(r'<prompt>(.*?)</prompt>', answer, re.IGNORECASE | re.DOTALL)
-        if match:
-            print("I was able to extract")
-            extracted_answer = match.group(1)
-        else:
-            print("I was unable to extract")
-            extracted_answer = answer
-            
-        clean_correct = clean_text(correct_answer)
-        clean_model = clean_text(extracted_answer)
-        print(clean_correct)
-        print(clean_model)
-
-        if clean_correct in clean_model:
-            return 1.0
-        return 0.0
-    
     # Evaluation based using an llm with Few-Shot Examples
     def evaluate_answer_model(self, model_answer, correct_answer):
-        judge_prompt = f"""You are a strict and objective grading assistant.
-        Read the student's answer and check if the "Target Fact" is true according to the student's sequence.
-
-        --- Example 1 ---
-        Target Fact: "Eli finished third."
-        Student's Answer: "The order is: 1. Joe, 2. Ada, 3. Amy, 4. Mel, 5. Eli"
-        Analysis: The student placed Eli in the 5th position. The target fact requires Eli to be third. This is a mismatch.
-        Verdict: [NO]
-
-        --- Example 2 ---
-        Target Fact: "The crow is the second from the left."
-        Student's Answer: "From left to right: Blue jay, Crow, Quail, Falcon, Robin."
-        Analysis: The student placed Crow in the 2nd position from the left. The target fact requires Crow to be second. This is a match.
-        Verdict: [YES]
+        judge_prompt = f"""You are a strict evaluator who have to decide if a student is reasoning correctly. The student will not always answer clearly,
+        you have to first think very well about the correct answer you receive and understand if the student answered correctly to that answer.
+        At the end of your evaluation you have to write [YES] if student was correct.
 
         --- REAL EVALUATION ---
-        Target Fact: "{correct_answer}"
+        Correct Answer: "{correct_answer}"
         Student's Answer: "{model_answer}"
-        Analysis:"""
+        is student answer correct?"""
         
         judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=150, temperature=0.0)
         print(f"\n[GIUDICE LLM]: {judgment.strip()}\n")
