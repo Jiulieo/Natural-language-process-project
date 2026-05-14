@@ -19,8 +19,8 @@ class LLMInterface:
             torch_dtype = dtype
         )
 
-        self.pipe.model.config.max_length = 4096
-        self.pipe.model.generation_config.max_length = 4096
+        #self.pipe.model.config.max_length = 4096
+        #self.pipe.model.generation_config.max_length = 4096
 
         print("modello caricato")
 

@@ -13,12 +13,29 @@ class PromptEvolver:
         you have to first think very well about the correct answer you receive and understand if the student answered correctly to that answer.
         At the end of your evaluation you have to write [YES] if student was correct.
 
+        ---Bad Examples---
+        Correct Answer: kiwis are the most expensive
+        Student Answer: The order of fruit prices, from cheapest to most expensive, is: 1. Cantaloupes 2. Apples 3. Loquats 4. Watermelons 5. Kiwis
+        Evaluation: [NO]
+        Correct Answer: Eli finished second to last
+        Student Answer: Final Answer: Eve: 1st Eli: 2nd Ana: 3rd Rob: 4th Mya: 5th
+        Evaluation: [YES]
+
+        ---Good examples---
+        Correct Answer: The truck is the oldest
+        Student Answer: The order from oldest to newest is: Motorcycle, Hatchback, Station Wagon, Convertible, Truck
+        Evaluation: [NO]
+        Correct Answer: The quail is the rightmost
+        Student Answer: The complete order is: Owl, Robin, Raven, Falcon, Quail.
+        Evaluation: [YES]
+
+
         --- REAL EVALUATION ---
         Correct Answer: "{correct_answer}"
         Student's Answer: "{model_answer}"
         is student answer correct? If so answer with [YES]"""
         
-        judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=150, temperature=0.0)
+        judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=150)
         print(f"\n[GIUDICE LLM]: {judgment.strip()}\n")
         
         if "[YES]" in judgment.upper():
@@ -77,7 +94,7 @@ class PromptEvolver:
         raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 100, temperature = 0.1)
     
         # use regex to extract only prompt if done correctly
-        match = re.search(r'<prompt>(.*?)</prompt>', raw_response, re.DOTALL)
+        match = re.search(r'<answer>(.*?)</answer>', raw_response, re.DOTALL)
         if match:
             return match.group(1).strip()
     
