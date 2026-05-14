@@ -27,19 +27,20 @@ class PromptEvolver:
         ---Good examples---
         Correct Answer: The truck is the oldest
         Student Answer: The order from oldest to newest is: Motorcycle, Hatchback, Station Wagon, Convertible, Truck
-        Evaluation: [NO]
+        Evaluation: The list clearly state that the order is from the oldest to the newest, so the student answer by saying that the truck is the 
+        newest, which is wrong[NO]
         Correct Answer: The quail is the rightmost
         Student Answer: The complete order is: Owl, Robin, Raven, Falcon, Quail.
-        Evaluation: [YES]
+        Evaluation: In the sentence we can see that the list produced has the quail as the rightmost, so the answer is [YES]
         Correct Answer: The tractor is the second-newest
         Student Answer: So the full order is: Limousine, Minivan, Sedan, Hatchback, Tractor
-        Evaluation: [NO]
+        Evaluation: The tractor cannot be seen as the second newest in the list so the answer is wrong [NO]
 
 
         --- REAL EVALUATION ---
         Correct Answer: "{correct_answer}"
         Student's Answer: "{model_answer}"
-        is student answer correct? If so answer with [YES]"""
+        is student answer correct? Reason step by step about it and if you think the student is correct end with [YES]"""
         
         judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=150)
         print(f"\n[GIUDICE LLM]: {judgment.strip()}\n")
