@@ -20,6 +20,9 @@ class PromptEvolver:
         Correct Answer: Eli finished second to last
         Student Answer: Final Answer: Eve: 1st Eli: 2nd Ana: 3rd Rob: 4th Mya: 5th
         Evaluation: [YES]
+        Correct Answer: The Bus is the newest
+        Student Answer: The full order is: Truck, Bus, Convertible, Tractor, Minivan
+        Evaluation: [YES]
 
         ---Good examples---
         Correct Answer: The truck is the oldest
@@ -28,6 +31,9 @@ class PromptEvolver:
         Correct Answer: The quail is the rightmost
         Student Answer: The complete order is: Owl, Robin, Raven, Falcon, Quail.
         Evaluation: [YES]
+        Correct Answer: The tractor is the second-newest
+        Student Answer: So the full order is: Limousine, Minivan, Sedan, Hatchback, Tractor
+        Evaluation: [NO]
 
 
         --- REAL EVALUATION ---
