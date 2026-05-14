@@ -27,14 +27,18 @@ class PromptEvolver:
         ---Good examples---
         Correct Answer: The truck is the oldest
         Student Answer: The order from oldest to newest is: Motorcycle, Hatchback, Station Wagon, Convertible, Truck
-        Evaluation: The list clearly state that the order is from the oldest to the newest, so the student answer by saying that the truck is the 
-        newest, which is wrong[NO]
+        Evaluation: The list clearly state that the order is from the oldest to the newest, so the student answer saying Motorcycle is the oldest, 
+        hatchback is the second oldest, station wagon is the third oldest, convertible is the fourth oldest, and truck the fifth oldest
+        which is the newest, then the student reasoning is wrong [NO]
         Correct Answer: The quail is the rightmost
         Student Answer: The complete order is: Owl, Robin, Raven, Falcon, Quail.
-        Evaluation: In the sentence we can see that the list produced has the quail as the rightmost, so the answer is [YES]
+        Evaluation: In the sentence we can take the list Owl,Robin, Raven, Falcon and Quail and decompose it from left to right,
+        and the last element will be the rightmost. The last element in the list is the Quail which make the reasoning in line with
+        the correct answer, therefore the student answer is right [YES]
         Correct Answer: The tractor is the second-newest
         Student Answer: So the full order is: Limousine, Minivan, Sedan, Hatchback, Tractor
-        Evaluation: The tractor cannot be seen as the second newest in the list so the answer is wrong [NO]
+        Evaluation: The order is not clearly state, so it is not possible to know if this list go from oldest to newest or from newest to oldest.
+        Anyway it is clear that the Tractor is the newest or the oldest, and so cannot be the second newest. The student answer is wrong [NO]
 
 
         --- REAL EVALUATION ---
