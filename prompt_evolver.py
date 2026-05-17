@@ -133,6 +133,7 @@ class PromptEvolver:
             history_lengths.append(current_answer_len)
 
             score = self.evaluate_answer_model(answer, sample['correct_answer'])
+            history_scores.append(score)
 
             print(f"step {i+1} | score: {score}")
             print(f"Target corretto: {sample['correct_answer']}")
