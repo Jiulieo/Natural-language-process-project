@@ -2,10 +2,12 @@ import re
 import string
 
 class PromptEvolver:
-    def __init__(self,data_manager,llm_client):
+    def __init__(self,data_manager,llm_client,llm_judge):
         self.data_manager = data_manager
         self.llm_client = llm_client
+        self.llm_judge = llm_judge
         self.current_prompt = "Guess the answer to this puzzle immediately without thinking."
+
     
     # Evaluation based using an llm with Few-Shot Examples
     def evaluate_answer_model(self, model_answer, correct_answer):
@@ -43,7 +45,7 @@ class PromptEvolver:
         Student's Answer: "{model_answer}"
         is student answer correct? Reason step by step about it and if you think the student is correct end with [YES]"""
         
-        judgment = self.llm_client.prompt_model(judge_prompt, max_new_tokens=150)
+        judgment = self.llm_judge.prompt_model(judge_prompt, max_new_tokens=150)
         print(f"\n[GIUDICE LLM]: {judgment.strip()}\n")
         
         if "[YES]" in judgment.upper():
@@ -130,11 +132,7 @@ class PromptEvolver:
             #Save data to plot
             history_lengths.append(current_answer_len)
 
-            #evaluate answer 
-            if evaluation == "standard":
-                score = self.evaluate_answer(answer, sample['correct_answer'])
-            else:
-                score = self.evaluate_answer_model(answer, sample['correct_answer'])
+            score = self.evaluate_answer_model(answer, sample['correct_answer'])
 
             print(f"step {i+1} | score: {score}")
             print(f"Target corretto: {sample['correct_answer']}")
