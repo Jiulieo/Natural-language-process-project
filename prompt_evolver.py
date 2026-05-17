@@ -24,21 +24,18 @@ class PromptEvolver:
         ---Good examples---
         Correct Answer: The truck is the oldest
         Student Answer: The order from oldest to newest is: Motorcycle, Hatchback, Station Wagon, Convertible, Truck
-        Evaluation: 1) The student answer is an ordered list of vehicles
-        2) The list clearly state that the order is from the oldest to the newest, so the student answer saying Motorcycle is the oldest, 
-        hatchback is the second oldest, station wagon is the third oldest, convertible is the fourth oldest, and truck the fifth oldest
-        which is the newest.
-        3) The student state that the truck is the newest, but the correct answer state the the truck is the oldest, then the student reasoning is wrong [NO]
+        Evaluation: step 1) The student answer is an ordered list of vehicles
+        step 2) The list state an order from oldest to newest so we can say: Motorcycle(oldest), hatchback, station wagon, Convertible, Truck(Newest)
+        step 3) The student state that the truck is the newest, but the correct answer state the the truck is the oldest, then the student reasoning is wrong [NO]
         Correct Answer: The quail is the rightmost
         Student Answer: The complete order is: Owl, Robin, Raven, Falcon, Quail.
-        Evaluation: 1)In the student answer we can take the list Owl,Robin, Raven, Falcon and Quail
-        2) Correct answer state that the quail is the rightmost, so we need to look at the list we get as a list of object from left to right, meaning
-        that the Owl will be the leftmost and the Quail the rightmost
+        Evaluation: 1)In the student answer we can see it produce an ordered list of birds
+        2) The list state an order that can be seen as from left to right (from 1 to 5), then we have: Owl(leftmost), Robin, Raven, Falcon, Quail(rightmost)
         3) It is then true that the quail is the rightmost, therefore the student answer is right [YES]
 
         In order to reason correctly you MUST:
-        1)Extract the final answer (usually a list) from the student reasoning
-        2)Understand using the correct answer what the answer represent and if it has an order (for example a list of object)
+        1)Extract the final answer (usually a list) from the student reasoning and understand what it represent
+        2)Understand the student answer with respect to the correct answer
         3)Confront the final answer with the correct answer and check if they match, if they match answer with [YES], else answer with [NO]
 
         --- REAL EVALUATION ---
