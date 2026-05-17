@@ -20,26 +20,26 @@ class PromptEvolver:
         Correct Answer: Eli finished second to last
         Student Answer: Final Answer: Eve: 1st Eli: 2nd Ana: 3rd Rob: 4th Mya: 5th
         Evaluation: [YES]
-        Correct Answer: The Bus is the newest
-        Student Answer: The full order is: Truck, Bus, Convertible, Tractor, Minivan
-        Evaluation: [YES]
 
         ---Good examples---
         Correct Answer: The truck is the oldest
         Student Answer: The order from oldest to newest is: Motorcycle, Hatchback, Station Wagon, Convertible, Truck
-        Evaluation: The list clearly state that the order is from the oldest to the newest, so the student answer saying Motorcycle is the oldest, 
+        Evaluation: 1) The student answer is an ordered list of vehicles
+        2) The list clearly state that the order is from the oldest to the newest, so the student answer saying Motorcycle is the oldest, 
         hatchback is the second oldest, station wagon is the third oldest, convertible is the fourth oldest, and truck the fifth oldest
-        which is the newest, then the student reasoning is wrong [NO]
+        which is the newest.
+        3) The student state that the truck is the newest, but the correct answer state the the truck is the oldest, then the student reasoning is wrong [NO]
         Correct Answer: The quail is the rightmost
         Student Answer: The complete order is: Owl, Robin, Raven, Falcon, Quail.
-        Evaluation: In the sentence we can take the list Owl,Robin, Raven, Falcon and Quail and decompose it from left to right,
-        and the last element will be the rightmost. The last element in the list is the Quail which make the reasoning in line with
-        the correct answer, therefore the student answer is right [YES]
-        Correct Answer: The tractor is the second-newest
-        Student Answer: So the full order is: Limousine, Minivan, Sedan, Hatchback, Tractor
-        Evaluation: The order is not clearly state, so it is not possible to know if this list go from oldest to newest or from newest to oldest.
-        Anyway it is clear that the Tractor is the newest or the oldest, and so cannot be the second newest. The student answer is wrong [NO]
+        Evaluation: 1)In the student answer we can take the list Owl,Robin, Raven, Falcon and Quail
+        2) Correct answer state that the quail is the rightmost, so we need to look at the list we get as a list of object from left to right, meaning
+        that the Owl will be the leftmost and the Quail the rightmost
+        3) It is then true that the quail is the rightmost, therefore the student answer is right [YES]
 
+        In order to reason correctly you MUST:
+        1)Extract the final answer (usually a list) from the student reasoning
+        2)Understand using the correct answer what the answer represent and if it has an order (for example a list of object)
+        3)Confront the final answer with the correct answer and check if they match, if they match answer with [YES], else answer with [NO]
 
         --- REAL EVALUATION ---
         Correct Answer: "{correct_answer}"
