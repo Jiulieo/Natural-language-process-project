@@ -45,7 +45,7 @@ class PromptEvolver:
         Student's Answer: "{model_answer}"
         is student answer correct? Reason step by step about it and if you think the student is correct end with [YES]"""
         
-        judgment = self.llm_judge.prompt_model(judge_prompt, max_new_tokens=150)
+        judgment = self.llm_judge.prompt_model(judge_prompt, max_new_tokens=250)
         print(f"\n[GIUDICE LLM]: {judgment.strip()}\n")
         
         if "[YES]" in judgment.upper():
