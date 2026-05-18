@@ -117,8 +117,8 @@ class PromptEvolver:
         print(f"Prompt optimization cycle")
 
         best_prompt = self.current_prompt
-        best_score = -1
-        best_answer_length = -1
+        best_streak = 0      
+        current_streak = 0
 
         history_lengths = []
         history_scores = []
@@ -143,28 +143,23 @@ class PromptEvolver:
             print(f"Risposta generata dal modello:\n{answer}")
 
             # To update we use the fact that it pass the singular test
-            if score > best_score:
-                best_score = score
-                best_prompt = self.current_prompt
-                best_answer_length = current_answer_len
-            elif score == best_score and score == 1.0:
-                # Se usiamo la valutazione LLM (modelli grandi), premiamo la verbosità (CoT)
-                if evaluation == "model" and current_answer_len > best_answer_length:
+            if score == 1.0:
+                current_streak += 1
+                print(f"Risposta Corretta! Striscia attuale del prompt: {current_streak}")
+                if current_streak > best_streak:
+                    best_streak = current_streak
                     best_prompt = self.current_prompt
-                    best_answer_length = current_answer_len
-                # Se usiamo la valutazione standard (modelli piccoli), premiamo la sintesi
-                elif evaluation == "standard" and current_answer_len < best_answer_length:
-                    best_prompt = self.current_prompt
-                    best_answer_length = current_answer_len
+                    print(f"NUOVO RECORD! Questo prompt è il migliore finora ({best_streak} di fila).")
+            else:
+                # 4. Ha sbagliato: Azzeriamo la striscia e mutiamo
+                print(f"Errore. La striscia si spezza a {current_streak}. Generazione nuovo prompt...")
+                current_streak = 0
+                self.current_prompt = self.mutate_prompt(self.current_prompt, sample['question'], answer)
+                print(f"Nuovo prompt in gara:\n{self.current_prompt}")
 
             
-            #if score is 0, then mutate the next prompt
-            if score < 1:
-                print("There was an error. New prompt generation")
-                self.current_prompt = self.mutate_prompt(self.current_prompt,sample['question'],answer)
-                print(f"New prompt: {self.current_prompt}")
-            else:
-                print("Correct answer")
+            
+        print(f"\nEvoluzione terminata. Il prompt vincitore ha indovinato {best_streak} domande di fila.")
 
         #return like that to store in a dictionary
         return {
