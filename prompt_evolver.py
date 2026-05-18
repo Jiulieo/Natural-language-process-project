@@ -6,7 +6,7 @@ class PromptEvolver:
         self.data_manager = data_manager
         self.llm_client = llm_client
         self.llm_judge = llm_judge
-        self.current_prompt = "Read the text. Write the final answer inside <answer> tags."
+        self.current_prompt = "Given a logical puzzle, carefully analyze the given information and constraints, then construct a solution by arranging the elements according to the established rules. Ensure all conditions are met and wrap your final answer within <answer> tags."
 
     
     # Evaluation based using an llm with Few-Shot Examples
