@@ -49,6 +49,7 @@ class PromptEvolver:
         is student answer correct? Reason step by step about it and if you think the student is correct end with [YES]"""
         
         judgment = self.llm_judge.prompt_model(judge_prompt, max_new_tokens=250)
+        print(f"\n[TESTO DELLO STUDENTE]:{model_answer.strip()}")
         print(f"\n[GIUDICE LLM]: {judgment.strip()}\n")
         
         if "[YES]" in judgment.upper():
@@ -58,7 +59,7 @@ class PromptEvolver:
     #If the answer is wrong, then we need to feed the prompt to a model and make it perform better
     def mutate_prompt(self, failed_prompt, problem, wrong_answer):
 
-        short_feedback = str(wrong_answer)[:50]
+        short_wrong_answer = str(wrong_answer)[-300:]
         meta_prompt_1_8B = f"""You are a Prompt Engineer. Your task is to write a short, universal instruction for a logic puzzle solver.
 
         FAILED PROMPT: "{failed_prompt}"
@@ -82,29 +83,30 @@ class PromptEvolver:
         meta_prompt_7B = f"""You are an expert Prompt Engineer for a logic puzzle solver.
         Your task is to analyze a failed prompt and write an improved, single-sentence instruction.
 
-        --- EXAMPLE 1 ---
-        Failed Prompt: "Guess the answer immediately."
-        Issue: It encourages random guessing instead of step-by-step logic.
-        Improved Prompt: "Think step-by-step to logically deduce the order of all items, and then enclose your final factual conclusion strictly inside <answer> tags."
-
-        --- EXAMPLE 2 ---
-        Failed Prompt: "Solve the puzzle and output the full order."
-        Issue: The solver outputs long lists and skips reasoning. It needs to use Chain-of-Thought to find the sequence, but only output the final fact.
-        Improved Prompt: "Use Chain-of-Thought reasoning to find the complete sequence, but inside the <answer> tag, write ONLY the specific sentence that answers the exact target question."
-
-        --- EXAMPLE 3 ---
-        Failed Prompt: "Write a single clear sentence in the answer tag."
-        Issue: The prompt formats the answer correctly, but forgets to tell the model to reason first. Without explicitly saying "think step-by-step", the solver will guess.
-        Improved Prompt: "Employ step-by-step logical deduction to solve the constraints, and enclose ONLY the exact requested statement inside an <answer> tag."
+        --- EXAMPLES OF GOOD IMPROVEMENTS ---
+        Failed: "Solve the puzzle."
+        Improved: <Prompt>Think step-by-step to logically deduce the order, and enclose your final conclusion strictly inside <answer> tags.</Prompt>
+        
+        Failed: "Write the final order."
+        Improved: <Prompt>Map each item to a numerical position to avoid contradictions, then output the final sequence inside <answer> tags.</Prompt>
 
         --- CURRENT TASK ---
         Failed Prompt: "{failed_prompt}"
-        Issue: The prompt fails because it does not explicitly instruct the model to think step-by-step or use Chain-of-Thought before writing the formatted answer.
+        
+        The model failed on this specific puzzle:
+        "{problem}"
+        
+        The model produced this incorrect or badly formatted output:
+        "...{short_wrong_answer}"
+        
+        Issue: The current prompt failed to prevent this mistake. 
+        Write a NEW, single-sentence prompt to fix this behavior. Do NOT just repeat the old prompt. Be creative, specific, and force the model to output the final result inside <answer> tags.
+        
         Improved Prompt:
         <Prompt>"""
 
         #to be more rigid in the generation we lower the temperature
-        raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 100, temperature = 0.1)
+        raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 100, temperature = 0.7)
     
         # use regex to extract only prompt if done correctly
         match = re.search(r'<answer>(.*?)</answer>', raw_response, re.DOTALL)
@@ -138,7 +140,7 @@ class PromptEvolver:
         accuracy = correct_count / len(batch)
         return accuracy, failed_samples
 
-    def run_evolution(self, steps = 5, batch_size=10):
+    def run_evolution(self, steps = 5, batch_size=5):
         print(f"Prompt optimization cycle")
 
         #prepare a batch of question that are equal for all the prompt
