@@ -6,7 +6,7 @@ class PromptEvolver:
         self.data_manager = data_manager
         self.llm_client = llm_client
         self.llm_judge = llm_judge
-        self.current_prompt = "Guess the answer to this puzzle immediately without thinking."
+        self.current_prompt = "Read the text. Write the final answer inside <answer> tags."
 
     
     # Evaluation based using an llm with Few-Shot Examples
@@ -81,29 +81,6 @@ class PromptEvolver:
         <prompt>"""
 
         #Because the 7B parameter can be a little more verbose i use another meta prompt here that let him reason more
-        meta_prompt_7B = f"""You are an expert Prompt Engineer for a logic puzzle solver.
-        Your task is to analyze a failed prompt and write an improved, single-sentence instruction. Remember that you produce 
-        generic prompt that can solve any logical problem about different topic, and so you always create prompt that can be used in many differen cases.
-
-        --- EXAMPLES ---
-        Failure context: "Find the leftmost bird among hawk, robin, and owl."
-        BAD Prompt(too specific): <Prompt> Solves this puzzle by ordering the birds step by step</Prompt>
-        GOOD Prompt(Generic): <Prompt> Think critically about the order relation of the entities inside the puzzle, and write the final sequence inside <answer> tags </Prompt>
-
-        Failure context: "Find the most expensive fruit between apple and pear."
-        BAD Prompt (Semi-specific): <Prompt>Analyze the relative prices of the fruits without using specific names to find the cheapest.</Prompt>
-        GOOD Prompt (Generic): <Prompt>Evaluate the comparative constraints between the given items to establish a complete hierarchy, placing your final conclusion inside <answer> tags.</Prompt>
-        
-        Failure context: "Who finished first between Amy, Dan, and Joe in the golf tournament?"
-        BAD Prompt (Too specific): <Prompt>Analyze the relationships between the golfers Amy, Dan, and Joe to find the final order.</Prompt>
-        GOOD Prompt (Generic): <Prompt>Establish a logical chain of constraints between the given items to deduce the correct order, placing your final conclusion inside <answer> tags.</Prompt>
-        
-        
-        --- CURRENT TASK ---
-        Failed Prompt: "{failed_prompt}"
-        The model failed on this specific puzzle:"{problem}"
-        Think step by step about a prompt which is generic as the failed prompt, but that can help to fix also the particular specific puzzle.
-        <Prompt>"""
 
         gradient_prompt = f"""You are analyzing an AI's reasoning mistake, the AI:
 
@@ -146,16 +123,6 @@ class PromptEvolver:
 
         raw_response = self.llm_client.prompt_model(mutation_prompt, max_new_tokens=150, temperature=0.7)
         return raw_response
-
-        #to be more rigid in the generation we lower the temperature
-        raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 200, temperature = 0.7)
-    
-        # use regex to extract only prompt if done correctly
-        match = re.search(r'<answer>(.*?)</answer>', raw_response, re.DOTALL)
-        if match:
-            return match.group(1).strip()
-    
-        return raw_response.strip()
     
     def evaluate_on_batch(self, batch, prompt):
         """
