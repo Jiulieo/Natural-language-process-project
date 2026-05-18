@@ -86,27 +86,32 @@ class PromptEvolver:
 
         --- EXAMPLES OF GOOD IMPROVEMENTS ---
         Failed Prompt: "Solve the puzzle."
+        Puzzle subject: "Find the most expensive fruit"
         Improved: <Prompt>Think step-by-step to logically deduce the order, and enclose your final conclusion strictly inside <answer> tags.</Prompt>
         
         Failed Prompt: "Write the final order."
+        Puzzle subject: "Find the oldest vehicle"
         Improved: <Prompt>Map each item to a numerical position to avoid contradictions, then output the final sequence inside <answer> tags.</Prompt>
 
         --- EXAMPLES OF BAD IMPROVEMENTS ---
         Failed Prompt: "Answer randomly"
-        The model failed on this specific puzzle:"you have to order different kind of birds"
-        Improved: <Prompt>Solve this logical puzzle and be careful about the position of the different birds<\Prompt>
+        Puzzle subject:"Find the leftmost bird"
+        Improved: <Prompt>Solve this logical puzzle and be careful about the position of the different birds</Prompt>
         
         --- CURRENT TASK ---
         Failed Prompt: "{failed_prompt}"
         The model failed on this specific puzzle:"{problem}"
-        Write a NEW, single-sentence prompt to fix this behavior. The prompt MUST be generic and usable by to solve
-        any kind of reasoning problem. Ask the model to output the final result inside <answer> tags.
-        
+        To new prompt you MUST:
+        1)Be a new, single sentence prompt
+        2)The prompt should be generic so that it can be used to solve any kind of problem
+        3)The prompt demand the model to reason, like using chain of thought or create a logical map...
+        4)The prompt ask the model to output the final result inside <answer> tags
+
         Improved Prompt:
         <Prompt>"""
 
         #to be more rigid in the generation we lower the temperature
-        raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 100, temperature = 0.7)
+        raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 150, temperature = 0.7)
     
         # use regex to extract only prompt if done correctly
         match = re.search(r'<answer>(.*?)</answer>', raw_response, re.DOTALL)
