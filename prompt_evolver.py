@@ -81,7 +81,7 @@ class PromptEvolver:
         <prompt>"""
 
         #Because the 7B parameter can be a little more verbose i use another meta prompt here that let him reason more
-        meta_prompt_7 = f"""You are an expert Prompt Engineer for a logic puzzle solver.
+        meta_prompt_7B = f"""You are an expert Prompt Engineer for a logic puzzle solver.
         Your task is to analyze a failed prompt and write an improved, single-sentence instruction. Remember that you produce 
         generic prompt that can solve any logical problem about different topic, and so you always create prompt that can be used in many differen cases.
 
@@ -105,50 +105,47 @@ class PromptEvolver:
         Think step by step about a prompt which is generic as the failed prompt, but that can help to fix also the particular specific puzzle.
         <Prompt>"""
 
-        meta_prompt_7B = f"""You are an expert Prompt Engineer for a logic puzzle solver.
-        Your task is to write a single-sentence instruction that helps a model solve ANY logic puzzle.
+        gradient_prompt = f"""You are analyzing an AI's reasoning mistake, the AI:
 
-        The prompt you write must be DOMAIN-AGNOSTIC — it must never mention birds, fruits,
-        people, names, positions, or any topic from the failed example.
+        1)get this puzzle:"{problem}"
 
-        === HOW TO THINK ===
-        Before writing, complete these two steps in your head:
-         STEP 1 — Identify the REASONING FAILURE (not the topic).
-             Ask: "What cognitive mistake did the model make?"
-             Examples of failure types:
-               - "It jumped to a conclusion without checking all constraints"
-               - "It did not establish a full order before answering"
-               - "It stated an intermediate result instead of the final answer"
-               - "It ignored a comparative relation between two entities"
+        2)received this failed prompt:"{failed_prompt}"
 
-         STEP 2 — Write a prompt that CORRECTS THAT FAILURE TYPE generically.
-             The prompt must work for puzzles about schedules, colors, weights,
-             speeds, rankings, or any other domain.
+        3)Produced this wrong answer:"{short_wrong_answer}"
 
-        === EXAMPLES OF CORRECT ABSTRACTION ===
+        In ONE sentence, describe the reasoning mistake the AI made.
+        Rules:
+        - Use ONLY abstract terms (e.g. "failed to verify all constraints", 
+        "stopped before establishing a complete order")
+        - Do NOT mention any domain words from the puzzle 
+        (no object names, no colors, no people, no places)
+        - Do NOT suggest a fix yet
 
-        Failure type identified: "Model answered without verifying all pairwise constraints"
-        BAD (topic-specific): <Prompt>Check all relationships between the birds before answering.</Prompt>
-        GOOD (abstract):      <Prompt>Before concluding, verify every stated constraint is satisfied by your answer, then write your final answer inside <answer> tags.</Prompt>
+        Mistake:"""
 
-        Failure type identified: "Model gave a partial order instead of a complete sequence"
-        BAD (topic-specific): <Prompt>Make sure to order all the fruits from cheapest to most expensive.</Prompt>
-        GOOD (abstract):      <Prompt>Derive a complete ordering of all entities using the given relations, and place only the final sequence inside <answer> tags.</Prompt>
+        print(gradient_prompt)
+        abstract_gradient = self._generate(gradient_prompt, max_new_tokens=100)
 
-        Failure type identified: "Model reasoned about the wrong comparison direction"
-        BAD (topic-specific): <Prompt>Pay attention to whether left/right means higher or lower position.</Prompt>
-        GOOD (abstract):      <Prompt>Carefully track the direction of each comparative constraint before building your conclusion, then state it inside <answer> tags.</Prompt>
+        # ── STEP 2: Muta il prompt usando SOLO il gradiente ─────────────────
+        # Il problema NON viene passato qui. Zero vocabolario di dominio.
+        mutation_prompt = f"""You are a Prompt Engineer for a logic puzzle solver.
 
-        === CURRENT TASK ===
-        Failed Prompt: "{failed_prompt}"
+        CURRENT INSTRUCTION (which failed):
+        "{failed_prompt}"
 
-        Failure context (use this ONLY to identify the reasoning failure type, do NOT copy its vocabulary):
-        "{problem}"
+        IDENTIFIED FAILURE:
+        "{abstract_gradient}"
 
-        Now write a single-sentence, domain-agnostic prompt.
-        Self-check before submitting: Does your prompt contain any topic-specific words (names, objects, domains)? If yes, rewrite it.
+        Write ONE improved instruction that fixes this failure. To write it correctly
+        Rules
+        1)The instruction must work for any logical puzzle
+        2)The instruction must be zero-knowledge-domain(meaning it has to be an abstract instruction that you can apply to any prolem)
+        3)You must instruct the solver to enclose its final output inside <answer> tags
 
         <Prompt>"""
+
+        new_prompt = self._generate(mutation_prompt, max_new_tokens=120)
+        return new_prompt
 
         #to be more rigid in the generation we lower the temperature
         raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 200, temperature = 0.7)
