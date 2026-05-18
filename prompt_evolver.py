@@ -113,59 +113,84 @@ class PromptEvolver:
     
         return raw_response.strip()
     
-    def run_evolution(self, steps = 5,evaluation = "standard"):
+    def evaluate_on_batch(self, batch, prompt):
+        """
+        Valuta il prompt sul batch e restituisce l'accuracy 
+        E una lista dei sample su cui ha fallito.
+        """
+        correct_count = 0
+        failed_samples = [] # Teniamo traccia degli errori
+        
+        for sample in batch:
+            full_input = f"{prompt} \n\n {sample['question']}"
+            answer = self.llm_client.prompt_model(full_input, max_new_tokens=512)
+            
+            score = self.evaluate_answer_model(answer, sample['correct_answer'])
+            if score == 1.0:
+                correct_count += 1
+            else:
+                # Salviamo il sample E la risposta sbagliata che ha dato
+                failed_samples.append({
+                    "sample": sample,
+                    "wrong_answer": answer
+                })
+                
+        accuracy = correct_count / len(batch)
+        return accuracy, failed_samples
+
+    def run_evolution(self, steps = 5, batch_size=10):
         print(f"Prompt optimization cycle")
 
-        best_prompt = self.current_prompt
-        best_streak = 0      
-        current_streak = 0
+        #prepare a batch of question that are equal for all the prompt
+        validation_batch = [self.data_manager.get_random_sample() for _ in range(batch_size)]
 
-        history_lengths = []
+        best_prompt = self.current_prompt
+        best_accuracy, current_failed_samples = self.evaluate_on_batch(validation_batch, best_prompt)
+        print(f"Baseline Prompt Accuracy: {best_accuracy * 100:.2f}%")
+
         history_scores = []
 
         for i in range(steps):
-            #Get an example from the dataset
-            sample = self.data_manager.get_random_sample()
-            full_input = f"{self.current_prompt} \n\n {sample['question']}"
+            print(f"\n--- Evolution Step {i+1}/{steps} ---")
+            
+            # Se l'accuracy è 100%, non c'è nulla da migliorare in questo batch
+            if best_accuracy == 1.0 or not current_failed_samples:
+                print("🏆 Il prompt ha raggiunto il 100% di accuracy sul batch! Evoluzione terminata anticipatamente.")
+                break
 
-            #feed the example to the model
-            answer = self.llm_client.prompt_model(full_input, max_new_tokens = 512)
-            current_answer_len = len(answer)
+            # 2. Peschiamo il primo errore dal test precedente (COSTO GPU: ZERO!)
+            target_failure = current_failed_samples[0]
+            failed_sample = target_failure["sample"]
+            wrong_answer = target_failure["wrong_answer"]
 
-            #Save data to plot
-            history_lengths.append(current_answer_len)
+            # 3. Mutiamo il prompt usando l'errore
+            print(f"Analisi dell'errore. Generazione nuovo prompt in corso...")
+            candidate_prompt = self.mutate_prompt(best_prompt, failed_sample['question'], wrong_answer)
+            print(f"Generato Candidate Prompt:\n{candidate_prompt}\n")
+            
+            # 4. Misuriamo il nuovo candidato sul batch
+            candidate_accuracy, candidate_failed_samples = self.evaluate_on_batch(validation_batch, candidate_prompt)
+            print(f"Candidate Prompt Accuracy: {candidate_accuracy * 100:.2f}%")
 
-            score = self.evaluate_answer_model(answer, sample['correct_answer'])
-            history_scores.append(score)
-
-            print(f"step {i+1} | score: {score}")
-            print(f"Target corretto: {sample['correct_answer']}")
-            print(f"Risposta generata dal modello:\n{answer}")
-
-            # To update we use the fact that it pass the singular test
-            if score == 1.0:
-                current_streak += 1
-                print(f"Risposta Corretta! Striscia attuale del prompt: {current_streak}")
-                if current_streak > best_streak:
-                    best_streak = current_streak
-                    best_prompt = self.current_prompt
-                    print(f"NUOVO RECORD! Questo prompt è il migliore finora ({best_streak} di fila).")
+            # 5. Decisione Critica
+            if candidate_accuracy > best_accuracy:
+                best_accuracy = candidate_accuracy
+                best_prompt = candidate_prompt
+                # Aggiorniamo la lista degli errori per il prossimo step
+                current_failed_samples = candidate_failed_samples 
+                history_scores.append(best_accuracy)
+                print(f"✅ METRICA MIGLIORATA! Mantengo il nuovo prompt. New best: {best_accuracy * 100:.2f}%")
             else:
-                # 4. Ha sbagliato: Azzeriamo la striscia e mutiamo
-                print(f"Errore. La striscia si spezza a {current_streak}. Generazione nuovo prompt...")
-                current_streak = 0
-                self.current_prompt = self.mutate_prompt(self.current_prompt, sample['question'], answer)
-                print(f"Nuovo prompt in gara:\n{self.current_prompt}")
+                # Se non migliora, teniamo il best_prompt vecchio (e i suoi failed_samples)
+                history_scores.append(best_accuracy)
+                print(f"❌ Metrica peggiorata o invariata ({candidate_accuracy * 100:.2f}%). Revert al prompt precedente.")
 
-            
-            
-        print(f"\nEvoluzione terminata. Il prompt vincitore ha indovinato {best_streak} domande di fila.")
 
         #return like that to store in a dictionary
         return {
             "best_prompt": best_prompt,
-            "lengths_over_time": history_lengths,
-            "scores_over_time": history_scores
+            "final_best_accuracy": best_accuracy,
+            "accuracy_history": history_scores
         }
 
 
