@@ -101,7 +101,7 @@ class PromptEvolver:
         Mistake:"""
 
         print(gradient_prompt)
-        abstract_gradient = self.llm_client.prompt_model(gradient_prompt, max_new_tokens=100, temperature=0.3).strip()
+        abstract_gradient = self.llm_judge.prompt_model(gradient_prompt, max_new_tokens=100, temperature=0.3).strip()
 
         # ── STEP 2: Muta il prompt usando SOLO il gradiente ─────────────────
         # Il problema NON viene passato qui. Zero vocabolario di dominio.
@@ -121,7 +121,7 @@ class PromptEvolver:
 
         <Prompt>"""
 
-        raw_response = self.llm_client.prompt_model(mutation_prompt, max_new_tokens=150, temperature=0.7)
+        raw_response = self.llm_judge.prompt_model(mutation_prompt, max_new_tokens=150, temperature=0.7)
         return raw_response
     
     def evaluate_on_batch(self, batch, prompt):
