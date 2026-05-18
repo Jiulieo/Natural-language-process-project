@@ -102,10 +102,7 @@ class PromptEvolver:
         --- CURRENT TASK ---
         Failed Prompt: "{failed_prompt}"
         The model failed on this specific puzzle:"{problem}"
-        To ensure you do not use specific names, first identify the specific subjects to avoid, then write the generic prompt.
-        Format your response EXACTLY like this:
-        SUBJECTS TO AVOID: (list the specific things/names in the puzzle)
-        IMPROVED PROMPT: <Prompt>(your 1-sentence prompt requiring reasoning and <answer> tags)</Prompt>
+        Think step by step about a prompt which is generic as the failed prompt, but that can help to fix also the particular specific puzzle.
         <Prompt>"""
 
         #to be more rigid in the generation we lower the temperature
