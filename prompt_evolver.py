@@ -81,7 +81,7 @@ class PromptEvolver:
         <prompt>"""
 
         #Because the 7B parameter can be a little more verbose i use another meta prompt here that let him reason more
-        meta_prompt_7B = f"""You are an expert Prompt Engineer for a logic puzzle solver.
+        meta_prompt_7 = f"""You are an expert Prompt Engineer for a logic puzzle solver.
         Your task is to analyze a failed prompt and write an improved, single-sentence instruction. Remember that you produce 
         generic prompt that can solve any logical problem about different topic, and so you always create prompt that can be used in many differen cases.
 
@@ -103,6 +103,51 @@ class PromptEvolver:
         Failed Prompt: "{failed_prompt}"
         The model failed on this specific puzzle:"{problem}"
         Think step by step about a prompt which is generic as the failed prompt, but that can help to fix also the particular specific puzzle.
+        <Prompt>"""
+
+        meta_prompt_7B = f"""You are an expert Prompt Engineer for a logic puzzle solver.
+        Your task is to write a single-sentence instruction that helps a model solve ANY logic puzzle.
+
+        The prompt you write must be DOMAIN-AGNOSTIC — it must never mention birds, fruits,
+        people, names, positions, or any topic from the failed example.
+
+        === HOW TO THINK ===
+        Before writing, complete these two steps in your head:
+         STEP 1 — Identify the REASONING FAILURE (not the topic).
+             Ask: "What cognitive mistake did the model make?"
+             Examples of failure types:
+               - "It jumped to a conclusion without checking all constraints"
+               - "It did not establish a full order before answering"
+               - "It stated an intermediate result instead of the final answer"
+               - "It ignored a comparative relation between two entities"
+
+         STEP 2 — Write a prompt that CORRECTS THAT FAILURE TYPE generically.
+             The prompt must work for puzzles about schedules, colors, weights,
+             speeds, rankings, or any other domain.
+
+        === EXAMPLES OF CORRECT ABSTRACTION ===
+
+        Failure type identified: "Model answered without verifying all pairwise constraints"
+        BAD (topic-specific): <Prompt>Check all relationships between the birds before answering.</Prompt>
+        GOOD (abstract):      <Prompt>Before concluding, verify every stated constraint is satisfied by your answer, then write your final answer inside <answer> tags.</Prompt>
+
+        Failure type identified: "Model gave a partial order instead of a complete sequence"
+        BAD (topic-specific): <Prompt>Make sure to order all the fruits from cheapest to most expensive.</Prompt>
+        GOOD (abstract):      <Prompt>Derive a complete ordering of all entities using the given relations, and place only the final sequence inside <answer> tags.</Prompt>
+
+        Failure type identified: "Model reasoned about the wrong comparison direction"
+        BAD (topic-specific): <Prompt>Pay attention to whether left/right means higher or lower position.</Prompt>
+        GOOD (abstract):      <Prompt>Carefully track the direction of each comparative constraint before building your conclusion, then state it inside <answer> tags.</Prompt>
+
+        === CURRENT TASK ===
+        Failed Prompt: "{failed_prompt}"
+
+        Failure context (use this ONLY to identify the reasoning failure type, do NOT copy its vocabulary):
+        "{problem}"
+
+        Now write a single-sentence, domain-agnostic prompt.
+        Self-check before submitting: Does your prompt contain any topic-specific words (names, objects, domains)? If yes, rewrite it.
+
         <Prompt>"""
 
         #to be more rigid in the generation we lower the temperature
