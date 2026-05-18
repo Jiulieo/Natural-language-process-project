@@ -82,36 +82,29 @@ class PromptEvolver:
 
         #Because the 7B parameter can be a little more verbose i use another meta prompt here that let him reason more
         meta_prompt_7B = f"""You are an expert Prompt Engineer for a logic puzzle solver.
-        Your task is to analyze a failed prompt and write an improved, single-sentence instruction.
+        Your task is to analyze a failed prompt and write an improved, single-sentence instruction that work for different kind of problem.
 
-        --- EXAMPLES OF GOOD IMPROVEMENTS ---
-        Failed Prompt: "Solve the puzzle."
-        Puzzle subject: "Find the most expensive fruit"
-        Improved: <Prompt>Think step-by-step to logically deduce the order, and enclose your final conclusion strictly inside <answer> tags.</Prompt>
+        --- EXAMPLES ---
+        Failure context: "Find the leftmost bird among hawk, robin, and owl."
+        BAD Prompt(too specific): <Prompt> Solves this puzzle by ordering the birds step by step</Prompt>
+        GOOD Prompt(Generic): <Prompt> Think critically about the order relation of the entities inside the puzzle, and write the final sequence inside <answer> tags </Prompt>
+
+        Failure context: "Who finished first between Amy, Dan, and Joe in the golf tournament?"
+        BAD Prompt (Too specific): <Prompt>Analyze the relationships between the golfers Amy, Dan, and Joe to find the final order.</Prompt>
+        GOOD Prompt (Generic): <Prompt>Establish a logical chain of constraints between the given items to deduce the correct order, placing your final conclusion inside <answer> tags.</Prompt>
         
-        Failed Prompt: "Write the final order."
-        Puzzle subject: "Find the oldest vehicle"
-        Improved: <Prompt>Map each item to a numerical position to avoid contradictions, then output the final sequence inside <answer> tags.</Prompt>
-
-        --- EXAMPLES OF BAD IMPROVEMENTS ---
-        Failed Prompt: "Answer randomly"
-        Puzzle subject:"Find the leftmost bird"
-        Improved: <Prompt>Solve this logical puzzle and be careful about the position of the different birds</Prompt>
         
         --- CURRENT TASK ---
         Failed Prompt: "{failed_prompt}"
         The model failed on this specific puzzle:"{problem}"
-        To new prompt you MUST:
-        1)Be a new, single sentence prompt
-        2)The prompt should be generic so that it can be used to solve any kind of problem
-        3)The prompt demand the model to reason, like using chain of thought or create a logical map...
-        4)The prompt ask the model to output the final result inside <answer> tags
-
-        Improved Prompt:
+        To ensure you do not use specific names, first identify the specific subjects to avoid, then write the generic prompt.
+        Format your response EXACTLY like this:
+        SUBJECTS TO AVOID: (list the specific things/names in the puzzle)
+        IMPROVED PROMPT: <Prompt>(your 1-sentence prompt requiring reasoning and <answer> tags)</Prompt>
         <Prompt>"""
 
         #to be more rigid in the generation we lower the temperature
-        raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 150, temperature = 0.7)
+        raw_response = self.llm_client.prompt_model(meta_prompt_7B, max_new_tokens = 200, temperature = 0.7)
     
         # use regex to extract only prompt if done correctly
         match = re.search(r'<answer>(.*?)</answer>', raw_response, re.DOTALL)
