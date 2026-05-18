@@ -85,23 +85,22 @@ class PromptEvolver:
         Your task is to analyze a failed prompt and write an improved, single-sentence instruction.
 
         --- EXAMPLES OF GOOD IMPROVEMENTS ---
-        Failed: "Solve the puzzle."
+        Failed Prompt: "Solve the puzzle."
         Improved: <Prompt>Think step-by-step to logically deduce the order, and enclose your final conclusion strictly inside <answer> tags.</Prompt>
         
-        Failed: "Write the final order."
+        Failed Prompt: "Write the final order."
         Improved: <Prompt>Map each item to a numerical position to avoid contradictions, then output the final sequence inside <answer> tags.</Prompt>
 
+        --- EXAMPLES OF BAD IMPROVEMENTS ---
+        Failed Prompt: "Answer randomly"
+        The model failed on this specific puzzle:"you have to order different kind of birds"
+        Improved: <Prompt>Solve this logical puzzle and be careful about the position of the different birds<\Prompt>
+        
         --- CURRENT TASK ---
         Failed Prompt: "{failed_prompt}"
-        
-        The model failed on this specific puzzle:
-        "{problem}"
-        
-        The model produced this incorrect or badly formatted output:
-        "...{short_wrong_answer}"
-        
-        Issue: The current prompt failed to prevent this mistake. 
-        Write a NEW, single-sentence prompt to fix this behavior. Do NOT just repeat the old prompt. Be creative, specific, and force the model to output the final result inside <answer> tags.
+        The model failed on this specific puzzle:"{problem}"
+        Write a NEW, single-sentence prompt to fix this behavior. The prompt MUST be generic and usable by to solve
+        any kind of reasoning problem. Ask the model to output the final result inside <answer> tags.
         
         Improved Prompt:
         <Prompt>"""
