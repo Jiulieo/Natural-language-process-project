@@ -82,13 +82,18 @@ class PromptEvolver:
 
         #Because the 7B parameter can be a little more verbose i use another meta prompt here that let him reason more
         meta_prompt_7B = f"""You are an expert Prompt Engineer for a logic puzzle solver.
-        Your task is to analyze a failed prompt and write an improved, single-sentence instruction that work for different kind of problem.
+        Your task is to analyze a failed prompt and write an improved, single-sentence instruction. Remember that you produce 
+        generic prompt that can solve any logical problem about different topic, and so you always create prompt that can be used in many differen cases.
 
         --- EXAMPLES ---
         Failure context: "Find the leftmost bird among hawk, robin, and owl."
         BAD Prompt(too specific): <Prompt> Solves this puzzle by ordering the birds step by step</Prompt>
         GOOD Prompt(Generic): <Prompt> Think critically about the order relation of the entities inside the puzzle, and write the final sequence inside <answer> tags </Prompt>
 
+        Failure context: "Find the most expensive fruit between apple and pear."
+        BAD Prompt (Semi-specific): <Prompt>Analyze the relative prices of the fruits without using specific names to find the cheapest.</Prompt>
+        GOOD Prompt (Generic): <Prompt>Evaluate the comparative constraints between the given items to establish a complete hierarchy, placing your final conclusion inside <answer> tags.</Prompt>
+        
         Failure context: "Who finished first between Amy, Dan, and Joe in the golf tournament?"
         BAD Prompt (Too specific): <Prompt>Analyze the relationships between the golfers Amy, Dan, and Joe to find the final order.</Prompt>
         GOOD Prompt (Generic): <Prompt>Establish a logical chain of constraints between the given items to deduce the correct order, placing your final conclusion inside <answer> tags.</Prompt>
