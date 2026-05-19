@@ -58,7 +58,7 @@ class PromptEvolver:
         return 0.0
     
     #If the answer is wrong, then we need to feed the prompt to a model and make it perform better
-    def mutate_prompt(self, failed_prompt, problem, wrong_answer,nr_parameters = "7B"):
+    def mutate_prompt(self, failed_prompt, problem, wrong_answer,nr_parameters):
         model_dimension = nr_parameters
         if nr_parameters == "1.8B":
             complexity_rule = "The instruction MUST be extremely concise and direct. Do NOT ask for complex step-by-step reasoning or deep analysis, as this overloads small models."
@@ -158,7 +158,7 @@ class PromptEvolver:
         accuracy = correct_count / len(batch)
         return accuracy, failed_samples
 
-    def run_evolution(self, steps = 5, batch_size=5):
+    def run_evolution(self, steps = 5, batch_size=5,nr_parameters = "7B"):
         print(f"Prompt optimization cycle")
 
         #prepare a batch of question that are equal for all the prompt
@@ -185,7 +185,7 @@ class PromptEvolver:
 
             # 3. Mutiamo il prompt usando l'errore
             print(f"Analisi dell'errore. Generazione nuovo prompt in corso...")
-            candidate_prompt = self.mutate_prompt(best_prompt, failed_sample['question'], wrong_answer)
+            candidate_prompt = self.mutate_prompt(best_prompt, failed_sample['question'], wrong_answer,nr_parameters)
             print(f"Generato Candidate Prompt:\n{candidate_prompt}\n")
             
             # 4. Misuriamo il nuovo candidato sul batch
