@@ -22,11 +22,15 @@ class LLMInterface:
         print("modello caricato")
 
     #send the prompt (logic problem) to the model and generate an answer
-    def prompt_model(self, prompt, max_new_tokens = 100, temperature = 0.1):
-        combined_prompt = f"You are a logical expert that have to solve a problem with constraints. Follow the user's instructions exactly.\n\n{prompt}"
-        messages = [
-            {"role":"user","content": combined_prompt}
-        ]
+    def prompt_model(self, prompt, system_prompt=None, max_new_tokens = 100, temperature = 0.1):
+        messages = []
+        #combined_prompt = f"You are a logical expert that have to solve a problem with constraints. Follow the user's instructions exactly.\n\n{prompt}"
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+
+        messages.append({"role": "user", "content": prompt})
+
+        #messages = [{"role":"user","content": combined_prompt}        ]
 
         outputs = self.pipe(
             messages,

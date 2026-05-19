@@ -134,6 +134,7 @@ class PromptEvolver:
         
         for sample in batch:
             full_input = f"{prompt} \n\n {sample['question']}"
+            system_student = "You are a logical expert. Follow the user's instructions exactly."
             answer = self.llm_client.prompt_model(full_input, max_new_tokens=512)
             
             score = self.evaluate_answer_model(answer, sample['correct_answer'])
