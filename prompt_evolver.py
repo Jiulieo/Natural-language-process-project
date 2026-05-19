@@ -6,7 +6,7 @@ class PromptEvolver:
         self.data_manager = data_manager
         self.llm_client = llm_client
         self.llm_judge = llm_judge
-        self.current_prompt = "Given the text, order the cars correctly inside the puzzle."
+        self.current_prompt = "Given the text, order the golfers correctly inside the puzzle."
 
     
     # Evaluation based using an llm with Few-Shot Examples
@@ -58,8 +58,12 @@ class PromptEvolver:
         return 0.0
     
     #If the answer is wrong, then we need to feed the prompt to a model and make it perform better
-    def mutate_prompt(self, failed_prompt, problem, wrong_answer):
-
+    def mutate_prompt(self, failed_prompt, problem, wrong_answer,nr_parameters = "7B"):
+        model_dimension = nr_parameters
+        if nr_parameters == "1.8B":
+            complexity_rule = "The instruction MUST be extremely concise and direct. Do NOT ask for complex step-by-step reasoning or deep analysis, as this overloads small models."
+        else:
+            complexity_rule = "The instruction should demand rigorous step-by-step reasoning, logical mapping, and iterative verification (Chain-of-Thought)."
         short_wrong_answer = str(wrong_answer)[-300:]
         meta_prompt_1_8B = f"""You are a Prompt Engineer. Your task is to write a short, universal instruction for a logic puzzle solver.
 
@@ -113,11 +117,15 @@ class PromptEvolver:
         IDENTIFIED FAILURE:
         "{abstract_gradient}"
 
+        MODEL DIMENSION:
+        "{model_dimension}"
+
         Write ONE improved instruction that fixes this failure. To write it correctly
         Rules
         1)The instruction must work for any logical puzzle
         2)The instruction must be zero-knowledge-domain(meaning it has to be an abstract instruction that you can apply to any prolem)
         3)You must instruct the solver to enclose its final output inside <answer> tags
+        4){complexity_rule}
 
         <Prompt>"""
 
