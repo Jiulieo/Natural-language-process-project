@@ -6,7 +6,7 @@ class PromptEvolver:
         self.data_manager = data_manager
         self.llm_client = llm_client
         self.llm_judge = llm_judge
-        self.current_prompt = "Given a logical puzzle, carefully analyze the given information and constraints, then construct a solution by arranging the elements according to the established rules. Ensure all conditions are met and wrap your final answer within <answer> tags."
+        self.current_prompt = "Given the text, order the cars correctly inside the puzzle."
 
     
     # Evaluation based using an llm with Few-Shot Examples
@@ -166,7 +166,7 @@ class PromptEvolver:
             
             # Se l'accuracy è 100%, non c'è nulla da migliorare in questo batch
             if best_accuracy == 1.0 or not current_failed_samples:
-                print("🏆 Il prompt ha raggiunto il 100% di accuracy sul batch! Evoluzione terminata anticipatamente.")
+                print(" Il prompt ha raggiunto il 100% di accuracy sul batch! Evoluzione terminata anticipatamente.")
                 break
 
             # 2. Peschiamo il primo errore dal test precedente (COSTO GPU: ZERO!)
