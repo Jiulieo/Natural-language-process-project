@@ -86,8 +86,6 @@ class PromptEvolver:
         NEW PROMPT:
         <prompt>"""
 
-        #Because the 7B parameter can be a little more verbose i use another meta prompt here that let him reason more
-
         gradient_prompt = f"""You are analyzing an AI's reasoning mistake, the AI:
 
         1)get this puzzle:"{problem}"
@@ -145,7 +143,7 @@ class PromptEvolver:
         for sample in batch:
             full_input = f"{prompt} \n\n {sample['question']}"
             system_student = "You are a logical expert. Follow the user's instructions exactly."
-            answer = self.llm_client.prompt_model(full_input, max_new_tokens=512)
+            answer = self.llm_client.prompt_model(full_input, system_prompt=system_student, max_new_tokens=512)
             
             score = self.evaluate_answer_model(answer, sample['correct_answer'])
             if score == 1.0:
