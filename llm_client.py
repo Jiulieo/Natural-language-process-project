@@ -37,7 +37,7 @@ class LLMInterface:
             max_new_tokens = max_new_tokens,
             temperature = temperature,
             do_sample = True if temperature>0 else False,
-            pad_token_id=self.pipe.tokenizer.eos_token_id #Useful for Qwen
+            pad_token_id=self.pipe.tokenizer.eos_token_id 
         )
 
         #Extract the answer

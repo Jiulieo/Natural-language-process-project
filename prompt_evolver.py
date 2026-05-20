@@ -6,7 +6,8 @@ class PromptEvolver:
         self.data_manager = data_manager
         self.llm_client = llm_client
         self.llm_judge = llm_judge
-        self.current_prompt = "Deduce the solution step-by-step, ensuring all conclusions logically follow from the given information. Enclose your final answer in <answer> tags."
+        self.current_prompt = "Read the text and guess the final order immediately. " \
+        "Do not explain your reasoning or think step-by-step. Just put the final answer in <answer> tags."
         #self.current_prompt = "Given the text, think step by step, abstract everything, do stuff to reason well, maybe try to check if not sure, DO NOT" \
         #"talk about golfers or stuff that are not inherent with the problems you will see and solve them, then give your answer."
 
