@@ -6,7 +6,6 @@ class LLMInterface:
     def __init__(self, model_id = "Qwen/Qwen1.5-1.8B-Chat"):
         print(f"caricamente del modello {model_id}")
 
-        #se possibile usa la gpu (cuda)
         self.device = 0 if torch.cuda.is_available() else -1
 
         #float 16 is optimized for GPU
@@ -19,7 +18,7 @@ class LLMInterface:
             torch_dtype = dtype
         )
 
-        print("modello caricato")
+        print("model loaded")
 
     #send the prompt (logic problem) to the model and generate an answer
     def prompt_model(self, prompt, system_prompt=None, max_new_tokens = 100, temperature = 0.1):
@@ -29,8 +28,6 @@ class LLMInterface:
             messages.append({"role": "system", "content": system_prompt})
 
         messages.append({"role": "user", "content": prompt})
-
-        #messages = [{"role":"user","content": combined_prompt}        ]
 
         outputs = self.pipe(
             messages,

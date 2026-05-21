@@ -8,8 +8,6 @@ class PromptEvolver:
         self.llm_judge = llm_judge
         self.current_prompt = "Read the text and guess the final order immediately. " \
         "Do not explain your reasoning or think step-by-step. Just put the final answer in <answer> tags."
-        #self.current_prompt = "Given the text, think step by step, abstract everything, do stuff to reason well, maybe try to check if not sure, DO NOT" \
-        #"talk about golfers or stuff that are not inherent with the problems you will see and solve them, then give your answer."
 
     
     # Evaluation based using an llm with Few-Shot Examples
@@ -53,8 +51,8 @@ class PromptEvolver:
         
         judgment = self.llm_judge.prompt_model(judge_prompt, max_new_tokens=250)
         print(f"\n[Correct answer]:{correct_answer}")
-        print(f"\n[TESTO DELLO STUDENTE]:{model_answer.strip()}")
-        print(f"\n[GIUDICE LLM]: {judgment.strip()}\n")
+        print(f"\n[STUDENT text]:{model_answer.strip()}")
+        print(f"\n[JUDGE LLM]: {judgment.strip()}\n")
         
         if "[YES]" in judgment.upper():
             return 1.0
@@ -108,8 +106,7 @@ class PromptEvolver:
         print(gradient_prompt)
         abstract_gradient = self.llm_judge.prompt_model(gradient_prompt, max_new_tokens=100, temperature=0.3).strip()
 
-        # ── STEP 2: Muta il prompt usando SOLO il gradiente ─────────────────
-        # Il problema NON viene passato qui. Zero vocabolario di dominio.
+        # ── STEP 2: muting prompt only using gradient ─────────────────
         mutation_prompt = f"""You are a Prompt Engineer for a logic puzzle solver.
 
         CURRENT INSTRUCTION (which failed):
@@ -135,11 +132,10 @@ class PromptEvolver:
     
     def evaluate_on_batch(self, batch, prompt):
         """
-        Valuta il prompt sul batch e restituisce l'accuracy 
-        E una lista dei sample su cui ha fallito.
+        Evaluate the prompt and return a list of failure case
         """
         correct_count = 0
-        failed_samples = [] # Teniamo traccia degli errori
+        failed_samples = [] 
         
         for sample in batch:
             full_input = f"{prompt} \n\n {sample['question']}"
@@ -150,7 +146,7 @@ class PromptEvolver:
             if score == 1.0:
                 correct_count += 1
             else:
-                # Salviamo il sample E la risposta sbagliata che ha dato
+                # Save sample and wrong answer
                 failed_samples.append({
                     "sample": sample,
                     "wrong_answer": answer
@@ -174,20 +170,20 @@ class PromptEvolver:
         for i in range(steps):
             print(f"\n--- Evolution Step {i+1}/{steps} ---")
             
-            # Se l'accuracy è 100%, non c'è nulla da migliorare in questo batch
+            # if accuracy 100%, stop evolution
             if best_accuracy == 1.0 or not current_failed_samples:
-                print(" Il prompt ha raggiunto il 100% di accuracy sul batch! Evoluzione terminata anticipatamente.")
+                print(" Best possible accuracy reached")
                 break
 
-            # 2. Peschiamo il primo errore dal test precedente (COSTO GPU: ZERO!)
+            # 2. Draw the first error done by the prompt
             target_failure = current_failed_samples[0]
             failed_sample = target_failure["sample"]
             wrong_answer = target_failure["wrong_answer"]
 
-            # 3. Mutiamo il prompt usando l'errore
-            print(f"Analisi dell'errore. Generazione nuovo prompt in corso...")
+            # 3. using the error mutate the prompt
+            print(f"Error analysis, new prompt generation")
             candidate_prompt = self.mutate_prompt(best_prompt, failed_sample['question'], wrong_answer,nr_parameters)
-            print(f"Generato Candidate Prompt:\n{candidate_prompt}\n")
+            print(f"New candidate Prompt:\n{candidate_prompt}\n")
             
             # 4. Misuriamo il nuovo candidato sul batch
             candidate_accuracy, candidate_failed_samples = self.evaluate_on_batch(validation_batch, candidate_prompt)
@@ -200,11 +196,11 @@ class PromptEvolver:
                 # Aggiorniamo la lista degli errori per il prossimo step
                 current_failed_samples = candidate_failed_samples 
                 history_scores.append(best_accuracy)
-                print(f"✅ METRICA MIGLIORATA! Mantengo il nuovo prompt. New best: {best_accuracy * 100:.2f}%")
+                print(f"✅ New best prompt. New best: {best_accuracy * 100:.2f}%")
             else:
                 # Se non migliora, teniamo il best_prompt vecchio (e i suoi failed_samples)
                 history_scores.append(best_accuracy)
-                print(f"❌ Metrica peggiorata o invariata ({candidate_accuracy * 100:.2f}%). Revert al prompt precedente.")
+                print(f"❌ Worst performance of best prompt ({candidate_accuracy * 100:.2f}%). Keeping best prompt.")
 
 
         #return like that to store in a dictionary
