@@ -4,12 +4,23 @@ import random
 
 class DatasetManager():
     #initialize the manager to point the folder with the example i want to read
-    def __init__(self,task_folder_path):
+    def __init__(self,task_folder_path,train_ratio=0.8, seed=42):
         self.file_path = os.path.join(task_folder_path, "task.json")
-        self.data = self.load_data()
+        
+        # Fixed seed, to ensure reproducibility
+        random.seed(seed)
+        
+        all_data = self.load_data()
+        
+        # --- Dataset split ---
+        random.shuffle(all_data)
+        split_index = int(len(all_data) * train_ratio)
+        
+        self.train_set = all_data[:split_index]
+        self.test_set = all_data[split_index:]
     
     def load_data(self):
-        #legge il json
+        #read json
         try:
             with open(self.file_path, 'r', encoding='utf-8') as f:
                 raw_data = json.load(f)
@@ -18,13 +29,19 @@ class DatasetManager():
             print(f"File non trovato: in {self.file_path}")
             return []
         
-    def get_random_sample(self):
-        #Pesca un problema a caso e restituisce input e target
-        if not self.data:
-            return None
-        #qui prende dalla lista (caricata tramite json.load) un elemento a caso, che corrisponde ad una coppia input/target
-        sample = random.choice(self.data)
+    def get_random_train_sample(self):
+        # Draw a problem from train set
+        if not self.train_set: return None
+        sample = random.choice(self.train_set)
+        return self._format_sample(sample)
+    
+    def get_random_test_sample(self):
+        # Draw random problem from test set
+        if not self.test_set: return None
+        sample = random.choice(self.test_set)
+        return self._format_sample(sample)
 
+    def _format_sample(self, sample):
         question = sample.get("input", "")
         target = sample.get("target_scores", {})
 

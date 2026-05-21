@@ -163,7 +163,7 @@ class PromptEvolver:
         print(f"Prompt optimization cycle")
 
         #prepare a batch of question that are equal for all the prompt
-        validation_batch = [self.data_manager.get_random_sample() for _ in range(batch_size)]
+        validation_batch = [self.data_manager.get_random_train_sample() for _ in range(batch_size)]
 
         best_prompt = self.current_prompt
         best_accuracy, current_failed_samples = self.evaluate_on_batch(validation_batch, best_prompt)
